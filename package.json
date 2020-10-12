@@ -10,7 +10,9 @@
 	},
 	"dependencies": {
 		"core-js": "^3.6.5",
+		"dotenv": "^8.2.0",
 		"express": "^4.17.1",
+		"node-fetch": "^2.6.1",
 		"vue": "^3.0.0"
 	},
 	"devDependencies": {
