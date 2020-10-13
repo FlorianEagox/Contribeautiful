@@ -22,7 +22,7 @@ export default {
 		console.log(process.env);
 		return {
 			clientID: process.env.VUE_APP_GH_CLIENT_ID
-		}
+		};
 	}
 };
 </script>
