@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Homepage from '../views/Homepage.vue';
+import Dashboard from '@/views/Dashboard.vue';
 
 const routes = [
 	{
 		path: '/',
 		name: 'Home',
 		component() {
-			return Homepage;
+			return (localStorage.getItem('userID')) ? Dashboard : Homepage;
 		}
 	},
 	{

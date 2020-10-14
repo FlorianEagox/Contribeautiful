@@ -22,7 +22,7 @@ export default {
 			if(reqUser.ok) {
 				const userData = await reqUser.json();
 				localStorage.setItem('userID', userData._id);
-				console.log(userData);
+				this.$router.push('/');
 			} else if(reqUser.status == 404) {
 				console.log('oof!');
 			}

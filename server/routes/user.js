@@ -9,7 +9,7 @@ router.get('/:id', async(req, res) => {
 		return;
 	}
 	const users = db.get('users');
-	const user = await users.findOne({$or: {_id: req.params.id}});
+	const user = await users.findOne({_id: req.params.id});
 	
 	if(user)
 		res.send(user);
