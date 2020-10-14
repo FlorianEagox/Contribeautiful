@@ -1,32 +1,29 @@
 <template>
-	<main>
-		<header>
-			<h1>Contribeautiful</h1>
-			<h2>Custom Git Contribution History</h2>
-		</header>
-		<section id="signup">
-			<p>Login with your Github</p>
-			<a :href="`https://github.com/login/oauth/authorize?client_id=${clientID}`">Sign Up</a>
-		</section>
-		<div>
-		</div>
-
-	</main>
+	<div id="nav">
+		<router-link to="/">Home</router-link> |
+	</div>
+	<router-view />
 </template>
 
-<script>
-
-export default {
-	name: 'App',
-	data() {
-		console.log(process.env);
-		return {
-			clientID: process.env.VUE_APP_GH_CLIENT_ID
-		};
-	}
-};
-</script>
-
 <style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
 
+#nav {
+  padding: 30px;
+}
+
+#nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+#nav a.router-link-exact-active {
+  color: #42b983;
+}
 </style>

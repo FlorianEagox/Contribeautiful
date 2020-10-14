@@ -1,11 +1,11 @@
-const express = require('express');
+const router = require('express').Router();
 const fetch = require('node-fetch');
 const { URLSearchParams } = require('url');
 const db = require('monk')('mongodb://localhost/contribeautiful');
 
 
-const router = express.Router();
 const tokenUrl = 'https://github.com/login/oauth/access_token';
+const clientUrl = 'http://sethpainter.com:3000'; // TODO: make this .env or serve client and server together.
 
 router.get('/', async(req, res) => {
 	if(!req.query?.code) {
@@ -31,8 +31,8 @@ router.get('/', async(req, res) => {
 		const users = db.get('users');
 		
 		// const user = await users.insert({_id: userData.id, access_token});
-		const user = await users.findOneAndUpdate({_id: userData.id}, {$set: {access_token}}, {upsert: true});
-		res.redirect(`/?user=${user._id}`);
+		const user = await users.findOneAndUpdate({github_id: userData.id}, {$set: {access_token}}, {upsert: true});
+		res.redirect(`${clientUrl}/${user._id}`);
 		db.close();
 	}
 	
