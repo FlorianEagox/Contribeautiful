@@ -68,7 +68,8 @@
 			],
 			"curly": 0,
 			"eqeqeq": 0,
-			"arrow-parens": 0
+			"arrow-parens": 0,
+			"no-unused-vars":"warn"
 		}
 	},
 	"browserslist": [
