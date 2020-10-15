@@ -13,6 +13,7 @@
 		"cors": "^2.8.5",
 		"dotenv": "^8.2.0",
 		"express": "^4.17.1",
+		"github-calendar": "^2.2.3",
 		"monk": "^7.3.2",
 		"node-fetch": "^2.6.1",
 		"vue": "^3.0.0",
@@ -69,7 +70,7 @@
 			"curly": 0,
 			"eqeqeq": 0,
 			"arrow-parens": 0,
-			"no-unused-vars":"warn"
+			"no-unused-vars": "warn"
 		}
 	},
 	"browserslist": [
