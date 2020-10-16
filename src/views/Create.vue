@@ -1,52 +1,93 @@
 <template>
-	<div id="chart" ref="chart">
-		<div v-for="(week, weekIndex) in drawingBoard" :key="week" class="row">
-			<div v-for="(day, dayIndex) in drawingBoard[weekIndex]" :key="day"
-				:class="`day day-${day}`"
-				@mousedown="() => {updateHoldingDown(true); colorDay(weekIndex, dayIndex)}" @mouseup="updateHoldingDown(false)"
-				@mouseover="colorDay(weekIndex, dayIndex)">
+	<main>
+		<section id="canvas" @wheel="cycleColor">
+			<div id="chart" ref="chart" @mouseleave="holdingDown = false">
+				<div v-for="(week, weekIndex) in drawingBoard" :key="week" class="row">
+					<div v-for="(day, dayIndex) in drawingBoard[weekIndex]" :key="day"
+						:class="`day day-${day}`"
+						@mousedown="holdingDown = true; colorDay(weekIndex, dayIndex)" @mouseup="holdingDown = false"
+						@mouseover="colorDay(weekIndex, dayIndex)"
+						v-bind:style="`background: #${colors[day]}`">
+					</div>
+				</div>
 			</div>
-		</div>
-	</div>
+			<div id="drawing-controls">
+				<div id="colors">
+					<div v-for="(color, index) in colors" :key="index"
+						:style="`background: #${color}`"
+						@click="changeColor(index)"
+						class="color"
+						:class="{ 'selected': this.currentColor == index }">
+					</div>
+				</div>
+				<button id="btn-clear" @click="clear">Clear</button>
+			</div>
+		</section>
+	</main>
+	<button @click="submit">Submit Contribution</button>
 </template>
 
 <script>
-let drawingBoard = new Array(52).fill(0).map(_ => new Array(7).fill(0));
+let drawingBoard = new Array(52).fill(0).map(() => new Array(7).fill(0));
 let currentColor = 1;
 let holdingDown = false;
+const colors = ['ebedf0', '9be9a8', '40c463', '30a14e', '216e39'];
 export default {
 	name: 'Create',
-	created() {
-		
-	},
 	data() {
-		return {drawingBoard, holdingDown};
+		return {drawingBoard, holdingDown, colors, currentColor};
 	},
 	methods: {
 		colorDay(weekIndex, dayIndex) {
-			if(holdingDown) this.drawingBoard[weekIndex][dayIndex] = currentColor;
+			if(this.holdingDown) this.drawingBoard[weekIndex][dayIndex] = this.currentColor;
 		},
 		updateHoldingDown(val) {
 			holdingDown = val;
-		}
+		},
+		changeColor(color) {
+			this.currentColor = color;
+		},
+		cycleColor(e) {
+			this.currentColor += e.deltaY > 0 ? 1 : -1;
+			if(this.currentColor >= colors.length) this.currentColor = 0;
+			else if(this.currentColor < 0) this.currentColor = colors.length - 1;
+		},
+		clear() {
+			this.drawingBoard = new Array(52).fill(0).map(() => new Array(7).fill(0));
+		},
+		submit() {
+
+		},
 	}
 };
 </script>
 
 <style>
+#canvas {
+	display: inline-block;
+}
 #chart {
 	display: flex;
+	background: #ebedf0;
 }
 #chart .day {
-	width: 11px;
-	height: 11px;
-	/* margin: 3px; */
-	background: lightgray;
-}
-#chart .day-1 {
-	background: lightgreen;
+	width: 15px;
+	height: 15px;
 }
 #chart .day:hover {
-	background: grey;
+	border: 1px solid grey;
+}
+#drawing-controls {
+	display: flex;
+	justify-content: space-between;
+}
+.color {
+	display: inline-block;
+	width: 11px;
+	height: 11px;
+}
+.selected {
+	border: 1px solid blue;
+	margin: 1px;
 }
 </style>
