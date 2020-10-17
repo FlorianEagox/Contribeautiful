@@ -20,15 +20,17 @@
 						:class="{ 'selected': this.currentColor == index }">
 					</div>
 				</div>
+				<input type="file" id="import" ref="import" accept=".jpg, .jpeg, .png" @change="importImage">
 				<button id="btn-clear" @click="clear">Clear</button>
 			</div>
 		</section>
 	</main>
+	<img ref="importedImg">
 	<button @click="submit">Submit Contribution</button>
 </template>
 
 <script>
-let drawingBoard = new Array(52).fill(0).map(() => new Array(7).fill(0));
+let drawingBoard = new Array(53).fill(0).map(() => new Array(7).fill(0));
 let currentColor = 1;
 let holdingDown = false;
 const colors = ['ebedf0', '9be9a8', '40c463', '30a14e', '216e39'];
@@ -53,7 +55,20 @@ export default {
 			else if(this.currentColor < 0) this.currentColor = colors.length - 1;
 		},
 		clear() {
-			this.drawingBoard = new Array(52).fill(0).map(() => new Array(7).fill(0));
+			this.drawingBoard = new Array(53).fill(0).map(() => new Array(7).fill(0));
+		},
+		importImage(e) {
+			const file = e.target.files[0];
+			// const img = this.$refs.importedImg;
+			const img = new Image(53, 7);
+			const reader = new FileReader();
+			reader.addEventListener('load', (e) => {
+				img.src = e.target.result;
+				createImageBitmap(img).then((imageData) => {
+					console.log(imageData);
+				});
+			});
+			reader.readAsDataURL(file);
 		},
 		submit() {
 
@@ -73,6 +88,7 @@ export default {
 #chart .day {
 	width: 15px;
 	height: 15px;
+	margin: 1px;
 }
 #chart .day:hover {
 	border: 1px solid grey;
