@@ -1,14 +1,10 @@
 <template>
 	<main>
-		<header>
-			<h1>Contribeautiful</h1>
-			<h2>Custom Git Contribution History</h2>
-		</header>
+		<h2>Custom Git Contribution History</h2>
 		<section id="signup">
 			<p>Login with your Github</p>
 			<a :href="`https://github.com/login/oauth/authorize?client_id=${clientID}`">Sign Up</a>
 		</section>
-		<div></div>
 	</main>
 </template>
 
