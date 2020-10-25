@@ -1,17 +1,15 @@
 <template>
 	<div id="nav">
 		<header>
-			<img src="./assets/logo.png" alt="logo">
+			<!-- <img src="@/assets/logo.png" alt="logo"> -->
 			<h1 id="title">Contribeautiful</h1>
 			<nav>
 				<ul>
-					<li><a href="/">Home</a></li>
-					<li><a href="/">About</a></li>
+					<li><router-link to="/">Home</router-link></li>
+					<li><router-link to="/about">About</router-link></li>
 				</ul>
 			</nav>
 		</header>
-			
-		<router-link to="/">Home</router-link> |
 	</div>
 	<router-view />
 </template>
@@ -23,12 +21,13 @@
 		box-sizing: border-box;
 	}
 	body {
-		font-family: fantasy;
+		font-family: "Fira Code";
 	}
 	header {
 		background: #333;
 		color: hotpink;
 		padding: 2em;
+		padding-bottom: 1em;
 	}
 	#title {
 		display: inline;
@@ -47,5 +46,6 @@
 	}
 	nav a {
 		text-decoration: none;
+		color: #ffdddd;
 	}
 </style>

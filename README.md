@@ -2,9 +2,11 @@
 
 A vue & express webapp to generate custom GitHub contribution history!
 
+![](https://img.shields.io/badge/Project%20Status-In%20progress-yellow)
+
 ## Project setup
 ```
-npm install
+npm i
 ```
 
 ## Debugging the Frontend

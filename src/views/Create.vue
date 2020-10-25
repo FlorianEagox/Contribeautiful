@@ -26,18 +26,26 @@
 		</section>
 	</main>
 	<img ref="importedImg">
+	<form id="info">
+		<label for="trim-edges">Trim Sides</label>
+		<input type="checkbox" name="chkTrim" v-model="trim" id="trim-edges">
+		<label for="commit-time">Commit time</label>
+		<input type="time" name="time" value="23:30" v-model="commitTime" id="commit-time">
+	</form>
 	<button @click="submit">Submit Contribution</button>
 </template>
 
 <script>
 let drawingBoard = new Array(53).fill(0).map(() => new Array(7).fill(0));
 let currentColor = 1;
+let trim;
+let commitTime;
 let holdingDown = false;
 const colors = ['ebedf0', '9be9a8', '40c463', '30a14e', '216e39'];
 export default {
 	name: 'Create',
 	data() {
-		return {drawingBoard, holdingDown, colors, currentColor};
+		return {drawingBoard, holdingDown, colors, currentColor, trim, commitTime};
 	},
 	methods: {
 		colorDay(weekIndex, dayIndex) {
@@ -64,14 +72,31 @@ export default {
 			const reader = new FileReader();
 			reader.addEventListener('load', (e) => {
 				img.src = e.target.result;
+				document.body.append(img);
 				createImageBitmap(img).then((imageData) => {
-					console.log(imageData);
+					console.log('hi!');
 				});
 			});
 			reader.readAsDataURL(file);
 		},
 		submit() {
-
+			const body = {
+				user: localStorage.getItem('userID'),
+				commitData: JSON.stringify(drawingBoard)
+			};
+			if(commitTime != '23:30')
+				body.commitTime = this.$refs.commitTime;
+			if(trim)
+				body.trim = true;
+			fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(body)
+			})
+				.then(res => res.text())
+				.then(data => console.log(data));
 		},
 	}
 };
