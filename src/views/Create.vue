@@ -44,6 +44,13 @@ let holdingDown = false;
 const colors = ['ebedf0', '9be9a8', '40c463', '30a14e', '216e39'];
 export default {
 	name: 'Create',
+	async created() {
+		const req = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph/${localStorage.getItem('userID')}`);
+		if(req.status == 404)
+			return;
+		const data = await req.json();
+		this.drawingBoard = data.commitData;
+	},
 	data() {
 		return {drawingBoard, holdingDown, colors, currentColor, trim, commitTime};
 	},
