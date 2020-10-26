@@ -30,7 +30,7 @@
 		<label for="trim-edges">Trim Sides</label>
 		<input type="checkbox" name="chkTrim" v-model="trim" id="trim-edges">
 		<label for="commit-time">Commit time</label>
-		<input type="time" name="time" value="23:30" v-model="commitTime" id="commit-time">
+		<input type="time" name="time" v-model="commitTime" id="commit-time">
 	</form>
 	<button @click="submit">Submit Contribution</button>
 </template>
@@ -38,8 +38,8 @@
 <script>
 let drawingBoard = new Array(53).fill(0).map(() => new Array(7).fill(0));
 let currentColor = 1;
-let trim;
-let commitTime;
+let trim = false;
+let commitTime = '12:34';
 let holdingDown = false;
 const colors = ['ebedf0', '9be9a8', '40c463', '30a14e', '216e39'];
 export default {
@@ -82,20 +82,20 @@ export default {
 		submit() {
 			const body = {
 				user: localStorage.getItem('userID'),
-				commitData: JSON.stringify(drawingBoard)
+				commitData: drawingBoard
 			};
+			console.log(this.commitTime, commitTime != '23:30');
 			if(commitTime != '23:30')
-				body.commitTime = this.$refs.commitTime;
+				body.time = commitTime;
 			if(trim)
 				body.trim = true;
+			console.log(body)
 			fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph`, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(body)
 			})
-				.then(res => res.text())
+				.then(res => res.json())
 				.then(data => console.log(data));
 		},
 	}
