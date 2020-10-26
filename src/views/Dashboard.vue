@@ -6,8 +6,7 @@
 			<p>Current Contribution History</p>
 			<div id="calander" ref="calander"></div>
 		</div>
-		<button>Create Custom history</button>
-		<div v-if="userData">{{ userData }}</div>
+		<button>Create Custom history</button>		
 	</main>
 </template>
 
@@ -25,7 +24,7 @@ export default {
 			await fetch('https://api.github.com/user', {headers: {'authorization': `token ${this.userData.access_token}`}})).json();
 	},
 	mounted() {
-		GithubCalander('#calander', this.github_profile.login, {global_stats: false, summary_text: ' '});
+		GithubCalander('#calander', this.github_profile.login, {global_stats: true, summary_text: ' '});
 	},
 	data() {
 		return {userData, github_profile};

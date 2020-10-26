@@ -1,4 +1,5 @@
-# contribeautiful
+
+# ![Logo](./src/assets/contribeautiful.svg) Contribeautiful
 
 A vue & express webapp to generate custom GitHub contribution history!
 

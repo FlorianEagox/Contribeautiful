@@ -1,7 +1,7 @@
 <template>
 	<div id="nav">
 		<header>
-			<!-- <img src="@/assets/logo.png" alt="logo"> -->
+			<img  src="@/assets/contribeautiful.svg" alt="logo">
 			<h1 id="title">Contribeautiful</h1>
 			<nav>
 				<ul>
@@ -27,6 +27,7 @@
 		background: #333;
 		color: hotpink;
 		padding: 2em;
+		font-family: Brush Script MT, Brush Script Std, cursive;
 		padding-bottom: 1em;
 	}
 	#title {
