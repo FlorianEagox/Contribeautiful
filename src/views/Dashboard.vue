@@ -18,10 +18,17 @@ let userData = null, github_profile;
 export default {
 	name: 'Dashboard',
 	async created() {
+		const userID = localStorage.getItem('userID');
 		this.userData = await (
-			await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${localStorage.getItem('userID')}`)).json();
-		this.github_profile = await (
-			await fetch('https://api.github.com/user', {headers: {'authorization': `token ${this.userData.access_token}`}})).json();
+			await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${userID}`)).json();
+		const profileReq = await fetch('https://api.github.com/user', {headers: {'authorization': `token ${this.userData.access_token}`}});
+		if(profileReq.ok)
+			this.github_profile = await profileReq.json();
+		else if(profileReq.status == 401) {
+			localStorage.removeItem('userID');
+			await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${userID}`, {method: 'DELETE'});
+			this.$router.push('/');
+		}
 	},
 	mounted() {
 		GithubCalander('#calander', this.github_profile.login, {global_stats: true, summary_text: ' '});
