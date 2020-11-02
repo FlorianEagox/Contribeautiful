@@ -3,7 +3,10 @@
 
 A vue & express webapp to generate custom GitHub contribution history!
 
-![](https://img.shields.io/badge/Project%20Status-In%20progress-yellow)
+![](https://img.shields.io/badge/Project%20Status-Blocked-red)
+
+## [Current Blocker](https://stackoverflow.com/questions/64563009/github-api-create-repo-returning-403)
+project will resume when this is fixed :c
 
 ## Project setup
 ```
