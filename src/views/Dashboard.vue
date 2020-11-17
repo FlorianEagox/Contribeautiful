@@ -21,17 +21,15 @@ export default {
 		this.userData = await ( // Get the server's userdata
 			await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${userID}`)).json();
 		const profileReq = await fetch('https://api.github.com/user', {headers: {'authorization': `token ${this.userData.access_token}`}});
-		if(profileReq.ok)
+		if(profileReq.ok) {
 			this.github_profile = await profileReq.json();
-		else if(profileReq.status == 401) { // If the GH app can no longer access this user anmore
+			GithubCalander('#calander', this.github_profile.login, {responsive: true, global_stats: true, summary_text: ' '});
+		} else if(profileReq.status == 401) { // If the GH app can no longer access this user anmore
 			localStorage.removeItem('userID');
 			// Delete the user from the db
 			await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${userID}`, {method: 'DELETE'});
 			this.$router.push('/');
 		}
-	},
-	mounted() {
-		GithubCalander('#calander', this.github_profile.login, {responsive: true, global_stats: true, summary_text: ' '});
 	},
 	data() {
 		return {userData, github_profile: {}};

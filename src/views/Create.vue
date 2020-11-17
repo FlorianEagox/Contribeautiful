@@ -80,7 +80,7 @@ export default {
 			reader.addEventListener('load', (e) => {
 				img.src = e.target.result;
 				document.body.append(img);
-				createImageBitmap(img).then((imageData) => {
+				createImageBitmap(img).then(imageData => {
 					console.log('hi!');
 				});
 			});
