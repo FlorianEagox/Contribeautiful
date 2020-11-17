@@ -3,7 +3,7 @@
 		<h2>Custom Git Contribution History</h2>
 		<section id="signup">
 			<p>Login with your Github</p>
-			<a :href="`https://github.com/login/oauth/authorize?client_id=${clientID}`">Sign Up</a>
+			<a :href="`https://github.com/login/oauth/authorize?client_id=${clientID}&scope=${scope}`">Sign Up</a>
 		</section>
 	</main>
 </template>
@@ -26,7 +26,8 @@ export default {
 	},
 	data() {
 		return {
-			clientID: process.env.VUE_APP_GH_CLIENT_ID
+			clientID: process.env.VUE_APP_GH_CLIENT_ID,
+			scope: 'public_repo'
 		};
 	}
 };

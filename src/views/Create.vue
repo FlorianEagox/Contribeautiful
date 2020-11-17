@@ -89,14 +89,12 @@ export default {
 		submit() {
 			const body = {
 				user: localStorage.getItem('userID'),
-				commitData: drawingBoard
+				commitData: this.drawingBoard
 			};
-			console.log(this.commitTime, commitTime != '23:30');
 			if(commitTime != '23:30')
 				body.time = commitTime;
 			if(trim)
 				body.trim = true;
-			console.log(body)
 			fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
