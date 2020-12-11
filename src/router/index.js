@@ -9,6 +9,7 @@ const routes = [
 		path: '/',
 		name: 'Home',
 		component() {
+			console.log(localStorage.getItem('userID'));
 			return (localStorage.getItem('userID')) ? Dashboard : Homepage;
 		}
 	},

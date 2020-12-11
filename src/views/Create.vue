@@ -49,7 +49,8 @@ export default {
 		if(req.status == 404)
 			return;
 		const data = await req.json();
-		this.drawingBoard = data.commitData;
+		console.log(data)
+		this.drawingBoard = data;
 	},
 	data() {
 		return {drawingBoard, holdingDown, colors, currentColor, trim, commitTime};
