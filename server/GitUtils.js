@@ -5,7 +5,7 @@ const repoName = 'contribeautiful_data';
 async function getRepo(username, accessToken) {
 	try {
 		try {
-			return await git.Repository.open(`repos/${username}`);
+			return await git.Repository.open(`repos/${username}/.git`);
 		} catch(e) {
 			return await git.Clone(`https://${username}:${accessToken}@github.com/${username}/${repoName}`, `repos/${username}`);
 		}
@@ -23,10 +23,10 @@ async function makeCommits(repo, year, commits, username, email) {
 		const timestamp = Math.floor(currentDay.setDate(currentDay.getDate() + 1) / 1000); // go to the next day, storing the result as a UNIX timestamp
 		const signature = git.Signature.create(username, email, timestamp, 0); // generate a git signature
 		for(let i = 0; i < pixelToNumCommits(numCommits); i++) // make the specified number of commits for the day
-			lastCommit = await makeCommit(repo, signature, username, `${currentDay}, commit ${i}`);
+			lastCommit = await makeCommit(repo, signature, username, `${currentDay.toISOString()}, commit ${i}`);
 	}
 	const origin = await repo.getRemote('origin');
-	await origin.push(['refs/heads/master:refs/heads/master']);
+	await origin.push(['refs/heads/main:refs/heads/main']);
 	return lastCommit;
 }
 

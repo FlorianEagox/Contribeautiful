@@ -94,9 +94,8 @@ export default {
 			const body = {
 				user: localStorage.getItem('userID'),
 				commitData: this.drawingBoard,
-				year
+				year: this.year
 			};
-			console.log(JSON.stringify(body))
 			if(commitTime != '23:30')
 				body.time = commitTime;
 			if(trim)
