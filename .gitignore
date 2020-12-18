@@ -1,3 +1,6 @@
+# Actual project stuff
+repos/
+
 .DS_Store
 node_modules
 /dist

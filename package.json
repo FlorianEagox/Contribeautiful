@@ -1,6 +1,5 @@
 {
 	"name": "contribeautiful",
-	"version": "0.1.0",
 	"private": true,
 	"scripts": {
 		"serve": "vue-cli-service serve --port 3000",
@@ -16,6 +15,7 @@
 		"github-calendar": "^2.2.6",
 		"monk": "^7.3.2",
 		"node-fetch": "^2.6.1",
+		"nodegit": "^0.27.0",
 		"vue": "^3.0.2",
 		"vue-router": "^4.0.0-rc.3"
 	},
