@@ -2,25 +2,21 @@
 	<main>
 		<section id="canvas" @wheel="cycleColor">
 			<div id="chart" ref="chart" @mouseleave="holdingDown = false">
-				<div v-for="(week, weekIndex) in drawingBoard" :key="week" class="row">
-					<div v-for="(day, dayIndex) in drawingBoard[weekIndex]" :key="day"
-						:class="`day day-${day}`"
-						@mousedown="holdingDown = true; colorDay(weekIndex, dayIndex)" @mouseup="holdingDown = false"
-						@mouseover="colorDay(weekIndex, dayIndex)"
-						v-bind:style="`background: #${colors[day]}`">
-					</div>
-				</div>
+				<div v-for="(day, dayIndex) in drawingBoard" :key="dayIndex"
+					:class="`day day-${day}`"
+					@mousedown="holdingDown = true; colorDay(dayIndex)" @mouseup="holdingDown = false"
+					@mouseover="colorDay(dayIndex)"
+					v-bind:style="`background: #${colors[day]}`"> </div>
 			</div>
 			<div id="drawing-controls">
 				<div id="colors">
-					<div v-for="(color, index) in colors" :key="index"
+					<div v-for="(color, index) in colors" :key="color"
 						:style="`background: #${color}`"
 						@click="changeColor(index)"
 						class="color"
 						:class="{ 'selected': this.currentColor == index }">
 					</div>
 				</div>
-				<input type="file" id="import" ref="import" accept=".jpg, .jpeg, .png" @change="importImage">
 				<button id="btn-clear" @click="clear">Clear</button>
 			</div>
 		</section>
@@ -29,35 +25,42 @@
 	<form id="info">
 		<label for="trim-edges">Trim Sides</label>
 		<input type="checkbox" name="chkTrim" v-model="trim" id="trim-edges">
-		<label for="commit-time">Commit time</label>
-		<input type="time" name="time" v-model="commitTime" id="commit-time">
+		<!-- <label for="commit-time">Commit time</label> -->
+		<!-- <input type="time" name="time" v-model="commitTime" id="commit-time"> -->
+		<label for="num-year">Year:</label>
+		<input type="number" id="num-year" v-model="year">
 	</form>
 	<button @click="submit">Submit Contribution</button>
 </template>
 
 <script>
-let drawingBoard = new Array(53).fill(0).map(() => new Array(7).fill(0));
+let drawingBoard = new Array(53 * 7).fill(0);
 let currentColor = 1;
 let trim = false;
 let commitTime = '12:34';
+let year = new Date().getFullYear();
 let holdingDown = false;
 const colors = ['ebedf0', '9be9a8', '40c463', '30a14e', '216e39'];
+
 export default {
 	name: 'Create',
 	async created() {
 		const req = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph/${localStorage.getItem('userID')}`);
+		window.setGraph = graph => this.drawingBoard = graph;
+		window.getGraph = () => this.drawingBoard;
 		if(req.status == 404)
 			return;
 		const data = await req.json();
 		console.log(data)
-		this.drawingBoard = data;
+		// this.drawingBoard = data;
 	},
 	data() {
-		return {drawingBoard, holdingDown, colors, currentColor, trim, commitTime};
+		return {drawingBoard, holdingDown, colors, currentColor, trim, commitTime, year};
 	},
 	methods: {
-		colorDay(weekIndex, dayIndex) {
-			if(this.holdingDown) this.drawingBoard[weekIndex][dayIndex] = this.currentColor;
+		colorDay(dayIndex) {
+			if(this.holdingDown)
+				this.drawingBoard[dayIndex] = this.currentColor;
 		},
 		updateHoldingDown(val) {
 			holdingDown = val;
@@ -71,7 +74,7 @@ export default {
 			else if(this.currentColor < 0) this.currentColor = colors.length - 1;
 		},
 		clear() {
-			this.drawingBoard = new Array(53).fill(0).map(() => new Array(7).fill(0));
+			this.drawingBoard.fill(0);
 		},
 		importImage(e) {
 			const file = e.target.files[0];
@@ -87,23 +90,29 @@ export default {
 			});
 			reader.readAsDataURL(file);
 		},
-		submit() {
+		async submit() {
 			const body = {
 				user: localStorage.getItem('userID'),
-				commitData: this.drawingBoard
+				commitData: this.drawingBoard,
+				year
 			};
+			console.log(JSON.stringify(body))
 			if(commitTime != '23:30')
 				body.time = commitTime;
 			if(trim)
 				body.trim = true;
-			fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(body)
-			})
-				.then(res => res.json())
-				.then(data => console.log(data));
-		},
+			try {
+				const req = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(body)
+				});
+				if(req.ok)
+					console.log(await req.text());
+			} catch(e) {
+				console.error(e);
+			}
+		}
 	}
 };
 </script>
@@ -113,13 +122,15 @@ export default {
 	display: inline-block;
 }
 #chart {
-	display: flex;
-	background: #ebedf0;
+	display: grid;
+	grid-template-rows: repeat(7, 1fr);
+	grid-auto-flow: column;
+	gap: 1px;
 }
 #chart .day {
 	width: 15px;
 	height: 15px;
-	margin: 1px;
+	display: inline-block;
 }
 #chart .day:hover {
 	border: 1px solid grey;

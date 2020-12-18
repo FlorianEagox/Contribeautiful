@@ -22,7 +22,7 @@ router.post('/', async(req, res) => {
 	const userCol = db.get('users');
 	const {access_token} = await userCol.findOne({_id: user});
 	// Create a repo if the user doesn't already have one.
-	const {login} = await (await fetch('https://api.github.com/user', {headers: {'Authorization': `token ${access_token}`}})).json();
+	const {login, email} = await (await fetch('https://api.github.com/user', {headers: {'Authorization': `token ${access_token}`}})).json();
 	const repoReq = await fetch(`https://api.github.com/repos/${login}/contribeautiful_data`);
 	if(repoReq.status == 404) { // check if the repo exists
 		try {
@@ -40,19 +40,21 @@ router.post('/', async(req, res) => {
 					auto_init: true
 				})
 			});
-			if(repo.ok)
-				
+			if(!res.ok)
+				res.status(500).send('Failed to create repo');
 		} catch(error) {
 			res.status(500).send(error);
 		}
 	}
-	if(trim)
-		commitData = commitData.filter(arr => arr.reduce((val, sum) => sum + val));
-	
 
+	const repo = await GitUtils.getRepo(login, access_token);
+	const lastID = await GitUtils.makeCommits(repo, year, commitData, login, email);
+	res.status(201).send(lastID);
 
-	const {graph} = await userCol.findOneAndUpdate({_id: user}, {$set: {graph: commitData}});
-	res.status(201).send(graph);
+	// if(trim)
+	// 	commitData = commitData.filter(arr => arr.reduce((val, sum) => sum + val));
+
+	// const {graph} = await userCol.findOneAndUpdate({_id: user}, {$set: {graph: commitData}});
 });
 
 module.exports = router;

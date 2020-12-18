@@ -2,7 +2,8 @@
 	"name": "contribeautiful",
 	"private": true,
 	"scripts": {
-		"serve": "vue-cli-service serve --port 3000",
+		"serve": "vue-cli-service serve --host sethpainter.com --port 3000",
+		"utils": "node server/UtilTester.js",
 		"build": "vue-cli-service build",
 		"lint": "vue-cli-service lint",
 		"server": "nodemon server/server.js"

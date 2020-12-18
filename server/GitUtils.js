@@ -2,9 +2,13 @@ const git = require('nodegit');
 const fs = require('fs');
 
 const repoName = 'contribeautiful_data';
-async function cloneRepo(username, accessToken) {
+async function getRepo(username, accessToken) {
 	try {
-		await git.Clone(`https://${username}:${accessToken}@github.com/${username}/${repoName}`, `repos/${username}`);
+		try {
+			return await git.Repository.open(`repos/${username}`);
+		} catch(e) {
+			return await git.Clone(`https://${username}:${accessToken}@github.com/${username}/${repoName}`, `repos/${username}`);
+		}
 	} catch(e) {
 		console.error(e);
 		return null;
@@ -21,6 +25,8 @@ async function makeCommits(repo, year, commits, username, email) {
 		for(let i = 0; i < pixelToNumCommits(numCommits); i++) // make the specified number of commits for the day
 			lastCommit = await makeCommit(repo, signature, username, `${currentDay}, commit ${i}`);
 	}
+	const origin = await repo.getRemote('origin');
+	await origin.push(['refs/heads/master:refs/heads/master']);
 	return lastCommit;
 }
 
@@ -61,4 +67,4 @@ async function makeCommit(repo, signature, dirName, message=' ') {
 	return commitId;
 }
 
-exports = {cloneRepo, makeCommits, firstWeekSunday}
+module.exports = {getRepo, makeCommits, firstWeekSunday}
