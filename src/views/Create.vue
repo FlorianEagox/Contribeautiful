@@ -23,10 +23,6 @@
 	</main>
 	<img ref="importedImg">
 	<form id="info">
-		<label for="trim-edges">Trim Sides</label>
-		<input type="checkbox" name="chkTrim" v-model="trim" id="trim-edges">
-		<!-- <label for="commit-time">Commit time</label> -->
-		<!-- <input type="time" name="time" v-model="commitTime" id="commit-time"> -->
 		<label for="num-year">Year:</label>
 		<input type="number" id="num-year" v-model="year">
 	</form>
@@ -36,8 +32,6 @@
 <script>
 let drawingBoard = new Array(53 * 7).fill(0);
 let currentColor = 1;
-let trim = false;
-let commitTime = '12:34';
 let year = new Date().getFullYear();
 let holdingDown = false;
 const colors = ['ebedf0', '9be9a8', '40c463', '30a14e', '216e39'];
@@ -55,7 +49,7 @@ export default {
 		// this.drawingBoard = data;
 	},
 	data() {
-		return {drawingBoard, holdingDown, colors, currentColor, trim, commitTime, year};
+		return {drawingBoard, holdingDown, colors, currentColor, year};
 	},
 	methods: {
 		colorDay(dayIndex) {
@@ -96,10 +90,6 @@ export default {
 				commitData: this.drawingBoard,
 				year: this.year
 			};
-			if(commitTime != '23:30')
-				body.time = commitTime;
-			if(trim)
-				body.trim = true;
 			try {
 				const req = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph`, {
 					method: 'POST',

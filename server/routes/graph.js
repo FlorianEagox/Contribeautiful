@@ -18,7 +18,7 @@ router.get('/:user', async(req, res) => {
 	res.send(graph);
 });
 router.post('/', async(req, res) => {
-	const {user, trim, year, commitData} = req.body;
+	const {user, year, commitData} = req.body;
 	const userCol = db.get('users');
 	const {access_token} = await userCol.findOne({_id: user});
 	// Create a repo if the user doesn't already have one.
@@ -51,10 +51,7 @@ router.post('/', async(req, res) => {
 	const lastID = await GitUtils.makeCommits(repo, year, commitData, login, email);
 	res.status(201).send(lastID);
 
-	// if(trim)
-	// 	commitData = commitData.filter(arr => arr.reduce((val, sum) => sum + val));
-
-	// const {graph} = await userCol.findOneAndUpdate({_id: user}, {$set: {graph: commitData}});
+	// const {graph} = await userCol.findOneAndUpdate({_id: user}, {$set: {lastCommit: lastID}});
 });
 
 module.exports = router;
