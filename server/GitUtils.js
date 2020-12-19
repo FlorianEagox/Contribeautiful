@@ -57,7 +57,7 @@ function pixelToNumCommits(color) {
 async function makeCommit(repo, signature, dirName, message=' ') {
 	await fs.appendFileSync(`repos/${dirName}/README.md`, `\n\ncommit ${message}`); // Modify the file
 	const index = await repo.refreshIndex(); // read latest
-	index.addByPath('README.md'); // stage each file
+	await index.addByPath('README.md'); // stage changes to readme
 	await index.write(); // flush changes to index
 	const changes = await index.writeTree(); // get reference to a set of changes
 	const head = await git.Reference.nameToId(repo, "HEAD"); // get reference to the current state

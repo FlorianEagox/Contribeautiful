@@ -27,7 +27,7 @@ export default {
 	data() {
 		return {
 			clientID: process.env.VUE_APP_GH_CLIENT_ID,
-			scope: 'public_repo'
+			scope: 'public_repo user:email'
 		};
 	}
 };

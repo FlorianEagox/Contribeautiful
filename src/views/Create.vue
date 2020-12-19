@@ -23,7 +23,7 @@
 	</main>
 	<img ref="importedImg">
 	<form id="info">
-		<label for="num-year">Year:</label>
+		<label for="num-year">Year</label>
 		<input type="number" id="num-year" v-model="year">
 	</form>
 	<button @click="submit">Submit Contribution</button>
