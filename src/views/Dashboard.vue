@@ -1,5 +1,5 @@
 <template>
-	<main>
+	<div class="container">
 		<header>
 			<img id="logo" src="@/assets/contribeautiful.svg" alt="logo">
 			<Title />
@@ -11,18 +11,26 @@
 			<p>Last Commit: </p>
 			<!-- <div id="calander" ref="calander"></div> -->
 		</div>
-		
-	</main>
+		<main>
+			<Canvas />
+			<form id="info">
+				<label for="num-year">Year</label>
+				<input type="number" id="num-year" v-model="year">
+			</form>
+			<button @click="submit">Submit Contribution</button>
+		</main>
+	</div>
 </template>
 
 <script>
 import GithubCalander from 'github-calendar';
 import Title from '../components/Title';
+import Canvas from '../components/Canvas'
 
 let userData = null, github_profile;
 export default {
 	name: 'Dashboard',
-	components: {Title},
+	components: {Title, Canvas},
 	async created() {
 		const userID = localStorage.getItem('userID');
 		this.userData = await ( // Get the server's userdata
@@ -68,4 +76,6 @@ export default {
 	#profile-picture {
 		max-width: 300px;
 	}
+
+
 </style>

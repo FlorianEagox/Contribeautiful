@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Homepage from '@/views/Homepage.vue';
 import Dashboard from '@/views/Dashboard.vue';
-import Create from '@/views/Create.vue';
-
 
 const routes = [
 	{
@@ -13,16 +11,10 @@ const routes = [
 			return (localStorage.getItem('userID')) ? Dashboard : Homepage;
 		}
 	},
-
 	{
 		path: '/:id',
 		name: 'SaveID',
 		component: Homepage
-	},
-	{
-		path: '/create',
-		name: 'Create',
-		component: Create 
 	}
 ];
 
