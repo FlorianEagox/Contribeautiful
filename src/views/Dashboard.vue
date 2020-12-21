@@ -1,29 +1,36 @@
 <template>
 	<main>
-		<h1>Dashboard</h1>
+		<header>
+			<img id="logo" src="@/assets/contribeautiful.svg" alt="logo">
+			<Title />
+			<button class="btn" id="logout">Logout</button>
+		</header>
 		<div id="user">
-			<img :src="github_profile.avatar_url" alt="">
-			<p>Current Contribution History</p>
-			<div id="calander" ref="calander"></div>
+			<img id="profile-picture" :src="githubProfile.avatar_url" alt="">
+			<h3 id="profile-name" v-text="githubProfile.login" />
+			<p>Last Commit: </p>
+			<!-- <div id="calander" ref="calander"></div> -->
 		</div>
-		<router-link to="/create">Create Custom history</router-link>		
+		
 	</main>
 </template>
 
 <script>
 import GithubCalander from 'github-calendar';
+import Title from '../components/Title';
 
 let userData = null, github_profile;
 export default {
 	name: 'Dashboard',
+	components: {Title},
 	async created() {
 		const userID = localStorage.getItem('userID');
 		this.userData = await ( // Get the server's userdata
 			await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${userID}`)).json();
 		const profileReq = await fetch('https://api.github.com/user', {headers: {'authorization': `token ${this.userData.access_token}`}});
 		if(profileReq.ok) {
-			this.github_profile = await profileReq.json();
-			GithubCalander('#calander', this.github_profile.login, {responsive: true, global_stats: true, summary_text: ' '});
+			this.githubProfile = await profileReq.json();
+			// GithubCalander('#calander', this.githubProfile.login, {responsive: true, global_stats: true, summary_text: ' '});
 		} else if(profileReq.status == 401) { // If the GH app can no longer access this user anmore
 			localStorage.removeItem('userID');
 			// Delete the user from the db
@@ -32,11 +39,33 @@ export default {
 		}
 	},
 	data() {
-		return {userData, github_profile: {}};
+		return {userData, githubProfile: this.githubProfile};
 	}
 };
 </script>
 
-<style>
-
+<style scoped>
+	header {
+		width: 100%;
+		box-shadow: 0 8px 4px rgba(0, 0, 0, .3);
+		display: flex;
+		align-items: center;
+	}
+	header #logo {
+		width: 60px;
+	}
+	header #title {
+		font-size: inherit;
+		/* display: inline-block; */
+	}
+	#logout {
+		margin-left: auto;
+		margin-top: inherit;
+		background: maroon;
+		color: white;
+		border: none;
+	}
+	#profile-picture {
+		max-width: 300px;
+	}
 </style>

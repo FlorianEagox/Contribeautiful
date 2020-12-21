@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Homepage from '@/views/Homepage.vue';
 import Dashboard from '@/views/Dashboard.vue';
 import Create from '@/views/Create.vue';
-import About from '@/views/About.vue';
+
 
 const routes = [
 	{
@@ -13,11 +13,7 @@ const routes = [
 			return (localStorage.getItem('userID')) ? Dashboard : Homepage;
 		}
 	},
-	{
-		path: '/about',
-		name: 'About',
-		component: About
-	},
+
 	{
 		path: '/:id',
 		name: 'SaveID',
