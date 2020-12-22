@@ -2,7 +2,7 @@
 	<section id="canvas" @wheel="cycleColor">
 		<div id="theme-select">
 			<span class="theme-option">
-				<input type="radio" name="theme" id="theme-light" @change="colors = lightColors">
+				<input type="radio" name="theme" id="theme-light" @change="colors = lightColors" checked="checked">
 				<label for="theme-light" id="btn-light" class="btn">Light</label>
 			</span>
 			<span class="theme-option">
@@ -81,24 +81,6 @@ export default {
 				});
 			});
 			reader.readAsDataURL(file);
-		},
-		async submit() {
-			const body = {
-				user: localStorage.getItem('userID'),
-				commitData: this.drawingBoard,
-				year: this.year
-			};
-			try {
-				const req = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(body)
-				});
-				if(req.ok)
-					console.log(await req.text());
-			} catch(e) {
-				console.error(e);
-			}
 		}
 	}
 };
@@ -107,6 +89,7 @@ export default {
 <style>
 	#canvas {
 		display: inline-block;
+		user-select: none;
 	}
 	input[type=radio] {
 		display: none;

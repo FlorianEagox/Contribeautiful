@@ -4,21 +4,21 @@
 		<h1 id="lbl-dashboard">Dashboard</h1>
 		<div class="wrapper">
 			<div id="user">
-				<img id="profile-picture" :src="githubProfile.avatar_url" alt="">
+				<!-- <img id="profile-picture" :src="githubProfile.avatar_url" alt="profile pic" > -->
 				<div class="text">
 					<h3 id="profile-name" v-text="githubProfile.login" />
 					<p>Last Commit: </p>
 				</div>
 			</div>
-			<div id="calander" />
+			<!-- <div id="calander" /> -->
 			<main>
-				<Canvas :year="selectedYear" />
+				<Canvas :year="selectedYear" ref="canvas" />
 				<section id="year">
 					<p>Year</p>
 					<hr>
 					<ul>
 						<li v-for="year in yearSpan" :key="year">
-							<input type="radio" :id="`rad-${year}`" v-model="selectedYear" name="year">
+							<input type="radio" :id="`rad-${year}`" :value="year" v-model="selectedYear" name="year">
 							<label :for="`rad-${year}`" v-text="year"/>
 						</li>
 					</ul>
@@ -32,7 +32,7 @@
 <script>
 import GithubCalander from 'github-calendar';
 import Header from '../components/Header';
-import Canvas from '../components/Canvas'
+import Canvas from '../components/Canvas';
 
 let userData = null, github_profile;
 let minYear = 2015;
@@ -48,7 +48,7 @@ export default {
 		const profileReq = await fetch('https://api.github.com/user', {headers: {'authorization': `token ${this.userData.access_token}`}});
 		if(profileReq.ok) {
 			this.githubProfile = await profileReq.json();
-			GithubCalander('#calander', this.githubProfile.login, {responsive: true, global_stats: true, summary_text: ' '});
+			// GithubCalander('#calander', this.githubProfile.login, {responsive: true, global_stats: true, summary_text: ' '});
 		} else if(profileReq.status == 401) { // If the GH app can no longer access this user anmore
 			localStorage.removeItem('userID');
 			// Delete the user from the db
@@ -62,8 +62,25 @@ export default {
 			yearSpan.push(year);
 		return {userData, githubProfile: this.githubProfile, yearSpan, selectedYear};
 	},
-	mounted() {
-		GithubCalander('#calander', this.githubProfile.login, {responsive: true, global_stats: true, summary_text: ' '});
+	methods: {
+		async submit() {
+			const body = {
+				user: localStorage.getItem('userID'),
+				commitData: this.$refs.canvas.drawingBoard,
+				year: this.selectedYear
+			};
+			try {
+				const req = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(body)
+				});
+				if(req.ok)
+					console.log(await req.text());
+			} catch(e) {
+				console.error(e);
+			}
+		}
 	}
 };
 </script>
