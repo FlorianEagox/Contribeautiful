@@ -1,5 +1,6 @@
 const git = require('nodegit');
 const fs = require('fs');
+const fetch = require('node-fetch');
 
 const repoName = 'contribeautiful_data';
 async function getRepo(username, accessToken) {
@@ -30,6 +31,30 @@ async function makeCommits(repo, year, commits, username, email) {
 	return lastCommit;
 }
 
+// Gets the commits that happened during a given year
+async function commitsFromYear(repo, year, callback) {
+	const first = await repo.getBranchCommit('main');
+	const history = first.history();
+	
+	history.on('end', commits => {
+		const minDate = firstWeekSunday(year).getTime();
+		const maxDate = new Date(`01-01-${parseInt(year)+1}`).getTime();	
+		let currentDay = firstWeekSunday(year);
+		const datesInRange = commits.map(commit => commit.date().getTime()).filter(date => minDate <= date && date <= maxDate) // Map all the commits to just their times
+			.reduce((obj, b) => { // Get them as just an object of how many times they occour
+				obj[b] = ++obj[b] || 1;
+				return obj;
+			}, {});  
+		const commitsPerDay = [];
+		while(currentDay.getTime() <= maxDate) {
+			currentDay.setDate(currentDay.getDate() + 1);
+			commitsPerDay.push(commitNumToPixels(datesInRange[currentDay.getTime()]));
+		}
+		callback(commitsPerDay);
+	});
+	history.start();
+}
+
 // Get the sunday of the week containing the start of a year
 function firstWeekSunday(year) {
 	let currentDay = new Date(`01/01/${year}`); // Get Jan 1st of the year as a start point
@@ -38,6 +63,7 @@ function firstWeekSunday(year) {
 	}
 	return currentDay;
 }
+
 // map the color of the number of commits to match GitHub's minimum contriutions for that color.
 function pixelToNumCommits(color) {
 	switch(color) {
@@ -45,13 +71,24 @@ function pixelToNumCommits(color) {
 		case 1:
 		case 2:
 			return color;
-			break;
 		case 3:
 			return 4;
-			break;
 		case 4:
 			return 6;
-			break;
+	}
+}
+function commitNumToPixels(commitNum) {
+	switch(commitNum) {
+		case 0:
+		case 1:
+		case 2:
+			return commitNum;
+		case 4:
+			return 3;
+		case 6:
+			return 4;
+		default:
+			return 0;
 	}
 }
 async function makeCommit(repo, signature, dirName, message=' ') {
@@ -67,4 +104,8 @@ async function makeCommit(repo, signature, dirName, message=' ') {
 	return commitId;
 }
 
-module.exports = {getRepo, makeCommits, firstWeekSunday}
+async function getGitHubProifle(access_token) {
+	return await (await fetch('https://api.github.com/user', {headers: {Authorization: `token ${access_token}`}})).json();
+}
+
+module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, getGitHubProifle};

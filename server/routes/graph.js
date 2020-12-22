@@ -4,18 +4,23 @@ const db = require('monk')('mongodb://localhost/contribeautiful');
 const ObjectId = require('mongodb').ObjectID;
 const GitUtils = require('../GitUtils');
 
-router.get('/:user', async(req, res) => {
-	const user = req.params.user;
+router.get('/:user/:year', async(req, res) => {
+	const {user, year} = req.params;
 	if(!ObjectId.isValid(user)) {
 		res.sendStatus(404);
 		return;
 	}
 
 	const users = db.get('users');
-	const {graph} = await users.findOne({_id: req.params.user});
-	if(!graph)
+	const {access_token} = await users.findOne({_id: req.params.user});
+	if(!access_token)
 		res.status(404);
-	res.send(graph);
+	const {login} = await GitUtils.getGitHubProifle(access_token);
+	console.log(login)
+	const repo = await GitUtils.getRepo(login, access_token);
+	GitUtils.commitsFromYear(repo, year, data => {
+		res.send(JSON.stringify(data));
+	});
 });
 router.post('/', async(req, res) => {
 	const {user, year, commitData} = req.body;

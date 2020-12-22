@@ -18,7 +18,7 @@
 					<hr>
 					<ul>
 						<li v-for="year in yearSpan" :key="year">
-							<input type="radio" :id="`rad-${year}`" :value="year" v-model="selectedYear" name="year">
+							<input type="radio" :id="`rad-${year}`" :value="year" v-model="selectedYear" name="year" @change="selectYear">
 							<label :for="`rad-${year}`" v-text="year"/>
 						</li>
 					</ul>
@@ -77,6 +77,15 @@ export default {
 				});
 				if(req.ok)
 					console.log(await req.text());
+			} catch(e) {
+				console.error(e);
+			}
+		},
+		async selectYear() {
+			try {
+				const req = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph/${localStorage.getItem('userID')}/${this.selectedYear}`);
+				if(req.ok)
+					this.$refs.canvas.drawingBoard = await req.json();
 			} catch(e) {
 				console.error(e);
 			}
