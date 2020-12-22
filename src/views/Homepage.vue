@@ -70,25 +70,11 @@ export default {
 };
 </script>
 
-<style>
-	@import url("https://use.fontawesome.com/releases/v5.7.1/css/all.css");
-	* {
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
-	}
-	body {
-		font-family: poppins;
-		background: #444;
-		color: white;
-	}
+<style scoped>
 	.grid-container {
 		height: 100vh;
 		display: grid;
 		place-items: center;
-	}
-	.wrapper {
-		/* text-align: center; */
 	}
 	a {
 		color: inherit;
@@ -101,28 +87,17 @@ export default {
 	}
 	.btn-wrapper {
 		text-align: right;
-	}
-	.btn {
-		display: inline-block;
-		font-size: 1.2em;
-		padding: 0.4em;
-		background: white;
-		box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
-		color: black;
-		text-decoration: none;
-		font-weight: bolder;
-		border-radius: 30px;
-		margin: 0.3em;
 		margin-top: 2em;
 	}
+	
 	#btn-learn {
 		background: none;
-		border: 2px solid white;
 		color: white;
 	}
-	#btn-learn:hover {
-		color: rgba(0, 0, 0, .8);
+	
+	#btn-github {
 		background: white;
+		color: black;
 	}
 	#btn-github:hover {
 		box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4);
@@ -142,7 +117,7 @@ export default {
 		text-align: center;
 		font-size: 3em;
 	}
-	#about h3, p {
+	#about h3, #about p {
 		margin: 0.5em 0;
 	}
 </style>

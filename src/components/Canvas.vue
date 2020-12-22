@@ -1,5 +1,15 @@
 <template>
 	<section id="canvas" @wheel="cycleColor">
+		<div id="theme-select">
+			<span class="theme-option">
+				<input type="radio" name="theme" id="theme-light" @change="colors = lightColors">
+				<label for="theme-light" id="btn-light" class="btn">Light</label>
+			</span>
+			<span class="theme-option">
+				<input type="radio" name="theme" id="theme-dark" @change="colors = darkColors">
+				<label for="theme-dark" id="btn-dark" class="btn">Dark</label>
+			</span>
+		</div>
 		<div id="chart" ref="chart" @mouseleave="holdingDown = false">
 			<div v-for="(day, dayIndex) in drawingBoard" :key="dayIndex"
 				:class="`day day-${day}`"
@@ -24,24 +34,20 @@
 <script>
 let drawingBoard = new Array(53 * 7).fill(0);
 let currentColor = 1;
-let year = new Date().getFullYear();
-let holdingDown = false;
-const colors = ['ebedf0', '9be9a8', '40c463', '30a14e', '216e39'];
 
+let holdingDown = false;
+const lightColors = ['ebedf0', '9be9a8', '40c463', '30a14e', '216e39'];
+const darkColors  = ['161b22', '01311f', '034525', '0f6d31', '00c647'];
+const colors = lightColors;
 export default {
 	name: 'Canvas',
-	async created() {
-		const req = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph/${localStorage.getItem('userID')}`);
+	props: ['year'],
+	created() {
 		window.setGraph = graph => this.drawingBoard = graph;
 		window.getGraph = () => this.drawingBoard;
-		if(req.status == 404)
-			return;
-		const data = await req.json();
-		console.log(data)
-		// this.drawingBoard = data;
 	},
 	data() {
-		return {drawingBoard, holdingDown, colors, currentColor, year};
+		return {drawingBoard, holdingDown, colors, currentColor, lightColors, darkColors};
 	},
 	methods: {
 		colorDay(dayIndex) {
@@ -102,15 +108,36 @@ export default {
 	#canvas {
 		display: inline-block;
 	}
+	input[type=radio] {
+		display: none;
+	}
+	#btn-light {
+		background: white;
+		color: black;
+	}
+	input:checked ~ #btn-light {
+		border: 2px solid black;
+	}
+	#btn-dark {
+		background: black;
+		color: white;
+		border: none;
+	}
+	input:checked ~ #btn-dark {
+		border: 2px solid white !important;
+	}
 	#chart {
+		min-width: calc(15px * 51);
+		min-height: calc(15px * 7);
 		display: grid;
 		grid-template-rows: repeat(7, 1fr);
 		grid-auto-flow: column;
 		gap: 1px;
+		aspect-ratio: 52 / 7;
 	}
 	#chart .day {
-		width: 15px;
-		height: 15px;
+		width: 1fr;
+		height:1fr;
 		display: inline-block;
 	}
 	#chart .day:hover {

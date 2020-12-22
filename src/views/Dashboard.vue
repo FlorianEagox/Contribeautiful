@@ -1,36 +1,46 @@
 <template>
 	<div class="container">
-		<header>
-			<img id="logo" src="@/assets/contribeautiful.svg" alt="logo">
-			<Title />
-			<button class="btn" id="logout">Logout</button>
-		</header>
-		<div id="user">
-			<img id="profile-picture" :src="githubProfile.avatar_url" alt="">
-			<h3 id="profile-name" v-text="githubProfile.login" />
-			<p>Last Commit: </p>
-			<!-- <div id="calander" ref="calander"></div> -->
+		<Header />
+		<h1 id="lbl-dashboard">Dashboard</h1>
+		<div class="wrapper">
+			<div id="user">
+				<img id="profile-picture" :src="githubProfile.avatar_url" alt="">
+				<div class="text">
+					<h3 id="profile-name" v-text="githubProfile.login" />
+					<p>Last Commit: </p>
+				</div>
+			</div>
+			<div id="calander" />
+			<main>
+				<Canvas :year="selectedYear" />
+				<section id="year">
+					<p>Year</p>
+					<hr>
+					<ul>
+						<li v-for="year in yearSpan" :key="year">
+							<input type="radio" :id="`rad-${year}`" v-model="selectedYear" name="year">
+							<label :for="`rad-${year}`" v-text="year"/>
+						</li>
+					</ul>
+				</section>
+				<button @click="submit" id="submit" class="btn">Submit Contribution</button>
+			</main>
 		</div>
-		<main>
-			<Canvas />
-			<form id="info">
-				<label for="num-year">Year</label>
-				<input type="number" id="num-year" v-model="year">
-			</form>
-			<button @click="submit">Submit Contribution</button>
-		</main>
 	</div>
 </template>
 
 <script>
 import GithubCalander from 'github-calendar';
-import Title from '../components/Title';
+import Header from '../components/Header';
 import Canvas from '../components/Canvas'
 
 let userData = null, github_profile;
+let minYear = 2015;
+const currentYear = new Date().getFullYear();
+let selectedYear = currentYear;
 export default {
 	name: 'Dashboard',
-	components: {Title, Canvas},
+	components: {Header, Canvas},
 	async created() {
 		const userID = localStorage.getItem('userID');
 		this.userData = await ( // Get the server's userdata
@@ -38,7 +48,7 @@ export default {
 		const profileReq = await fetch('https://api.github.com/user', {headers: {'authorization': `token ${this.userData.access_token}`}});
 		if(profileReq.ok) {
 			this.githubProfile = await profileReq.json();
-			// GithubCalander('#calander', this.githubProfile.login, {responsive: true, global_stats: true, summary_text: ' '});
+			GithubCalander('#calander', this.githubProfile.login, {responsive: true, global_stats: true, summary_text: ' '});
 		} else if(profileReq.status == 401) { // If the GH app can no longer access this user anmore
 			localStorage.removeItem('userID');
 			// Delete the user from the db
@@ -47,35 +57,80 @@ export default {
 		}
 	},
 	data() {
-		return {userData, githubProfile: this.githubProfile};
+		let yearSpan = [];
+		for(let year = currentYear; year >= minYear; year--)
+			yearSpan.push(year);
+		return {userData, githubProfile: this.githubProfile, yearSpan, selectedYear};
+	},
+	mounted() {
+		GithubCalander('#calander', this.githubProfile.login, {responsive: true, global_stats: true, summary_text: ' '});
 	}
 };
 </script>
 
 <style scoped>
-	header {
-		width: 100%;
-		box-shadow: 0 8px 4px rgba(0, 0, 0, .3);
+	.container {
 		display: flex;
-		align-items: center;
+		flex-direction: column;
 	}
-	header #logo {
-		width: 60px;
+	.wrapper {
+		width: 100%;
+		display: flex;
+		justify-content: space-evenly;
+		align-items: flex-start;
 	}
-	header #title {
-		font-size: inherit;
-		/* display: inline-block; */
+	.wrapper > * {
+		margin-top: 4em;
 	}
-	#logout {
-		margin-left: auto;
-		margin-top: inherit;
-		background: maroon;
-		color: white;
-		border: none;
+
+	#lbl-dashboard {
+		text-align: center;
+		padding: 0 0.4em;
+		padding-bottom: 0.4em;
+		margin: 0 auto;
+		margin-top: 1em;
+		border-bottom: 3px solid white;
 	}
-	#profile-picture {
+
+	#user {
+		border-radius: 25px;
+		box-shadow: 0 0 5px rgba(0, 0, 0, 1);
+		overflow: hidden;
+	}
+	#user img {
 		max-width: 300px;
 	}
+	#user .text {
+		padding: 1em;
+	}
 
-
+	main {
+		display: grid;
+		grid-template-columns: auto auto;
+		justify-items: start;
+	}
+	main #submit {
+		/* display: block; */
+	}
+	#year {
+		padding: 0 1em;
+	}
+	#year [type=radio] {
+		display: none;
+	}
+	#year ul {
+		list-style-type: none;
+	}
+	#year label {
+		display: block;
+		margin-top: 0.1em;
+		padding: 0.3em 0.7em;
+		border-radius: 5px;
+	}
+	#year input:checked ~ label {
+		background: mediumslateblue;
+	}
+	#year label:hover {
+		background: #666;
+	}
 </style>
