@@ -19,7 +19,10 @@ router.get('/:user/:year', async(req, res) => {
 	console.log(login)
 	const repo = await GitUtils.getRepo(login, access_token);
 	GitUtils.commitsFromYear(repo, year, data => {
-		res.send(JSON.stringify(data));
+		if(!data?.every(item => item == 0))
+			res.send(JSON.stringify(data));
+		else
+			res.status(404).send();
 	});
 });
 router.post('/', async(req, res) => {

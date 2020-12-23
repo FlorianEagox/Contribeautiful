@@ -2,6 +2,8 @@ const git = require('nodegit');
 const fs = require('fs');
 const fetch = require('node-fetch');
 
+const {firstWeekSunday} = require('../Utils');
+
 const repoName = 'contribeautiful_data';
 async function getRepo(username, accessToken) {
 	try {
@@ -17,7 +19,7 @@ async function getRepo(username, accessToken) {
 }
 
 async function makeCommits(repo, year, commits, username, email) {
-	const currentDay = firstWeekSunday(year); // start with the first sunday of the year
+	const currentDay = new Date(year, 0, 1); // start with the first sunday of the year
 	currentDay.setDate(currentDay.getDate() - 1); // Current day = the next day
 	let lastCommit;
 	for(const [day, numCommits] of commits.entries()) { // loop through every day
@@ -37,31 +39,22 @@ async function commitsFromYear(repo, year, callback) {
 	const history = first.history();
 	
 	history.on('end', commits => {
-		const minDate = firstWeekSunday(year).getTime();
-		const maxDate = new Date(`01-01-${parseInt(year)+1}`).getTime();	
-		let currentDay = firstWeekSunday(year);
+		const minDate = new Date(year,  0,  1).getTime();
+		const maxDate = new Date(year, 11, 31).getTime();	
+		let currentDay = new Date(year,  0,  1);
 		const datesInRange = commits.map(commit => commit.date().getTime()).filter(date => minDate <= date && date <= maxDate) // Map all the commits to just their times
 			.reduce((obj, b) => { // Get them as just an object of how many times they occour
 				obj[b] = ++obj[b] || 1;
 				return obj;
 			}, {});  
 		const commitsPerDay = [];
-		while(currentDay.getTime() <= maxDate) {
-			currentDay.setDate(currentDay.getDate() + 1);
+		while(currentDay.getTime() < maxDate) {
 			commitsPerDay.push(commitNumToPixels(datesInRange[currentDay.getTime()]));
+			currentDay.setDate(currentDay.getDate() + 1);
 		}
 		callback(commitsPerDay);
 	});
 	history.start();
-}
-
-// Get the sunday of the week containing the start of a year
-function firstWeekSunday(year) {
-	let currentDay = new Date(`01/01/${year}`); // Get Jan 1st of the year as a start point
-	while(currentDay.getDay() != 0) { // until we're on a sunday
-		currentDay.setDate(currentDay.getDate() - 1); // walk backwards towards the previous day
-	}
-	return currentDay;
 }
 
 // map the color of the number of commits to match GitHub's minimum contriutions for that color.

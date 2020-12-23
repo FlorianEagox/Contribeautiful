@@ -11,11 +11,15 @@
 			</span>
 		</div>
 		<div id="chart" ref="chart" @mouseleave="holdingDown = false">
+			<div v-for="(spot, index) in yearStartOffset(year)"
+				:key="index"
+				class="placeholder"
+			/>
 			<div v-for="(day, dayIndex) in drawingBoard" :key="dayIndex"
 				:class="`day day-${day}`"
 				@mousedown="holdingDown = true; colorDay(dayIndex)" @mouseup="holdingDown = false"
 				@mouseover="colorDay(dayIndex)"
-				v-bind:style="`background: #${colors[day]}`"> </div>
+				v-bind:style="`background: #${colors[day]}`" />
 		</div>
 		<div id="drawing-controls">
 			<div id="colors">
@@ -23,8 +27,7 @@
 					:style="`background: #${color}`"
 					@click="changeColor(index)"
 					class="color"
-					:class="{ 'selected': this.currentColor == index }">
-				</div>
+					:class="{ 'selected': this.currentColor == index }" />
 			</div>
 			<button id="btn-clear" @click="clear">Clear</button>
 		</div>
@@ -32,7 +35,7 @@
 </template>
 
 <script>
-let drawingBoard = new Array(53 * 7).fill(0);
+import {initializeEmptyCanvas, yearStartOffset} from '../../Utils';
 let currentColor = 1;
 
 let holdingDown = false;
@@ -45,9 +48,10 @@ export default {
 	created() {
 		window.setGraph = graph => this.drawingBoard = graph;
 		window.getGraph = () => this.drawingBoard;
+		this.initialize();
 	},
 	data() {
-		return {drawingBoard, holdingDown, colors, currentColor, lightColors, darkColors};
+		return {drawingBoard: this.drawingBoard, holdingDown, colors, currentColor, lightColors, darkColors};
 	},
 	methods: {
 		colorDay(dayIndex) {
@@ -81,7 +85,11 @@ export default {
 				});
 			});
 			reader.readAsDataURL(file);
-		}
+		},
+		initialize() {
+			this.drawingBoard = initializeEmptyCanvas(this.year);
+		},
+		yearStartOffset
 	}
 };
 </script>
@@ -117,6 +125,11 @@ export default {
 		grid-auto-flow: column;
 		gap: 1px;
 		aspect-ratio: 52 / 7;
+	}
+	#chart .placeholder {
+		width: 1fr;
+		height: 1fr;
+		display: inline-block;
 	}
 	#chart .day {
 		width: 1fr;

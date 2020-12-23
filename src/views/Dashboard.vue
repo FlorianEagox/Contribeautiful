@@ -4,15 +4,14 @@
 		<h1 id="lbl-dashboard">Dashboard</h1>
 		<div class="wrapper">
 			<div id="user">
-				<!-- <img id="profile-picture" :src="githubProfile.avatar_url" alt="profile pic" > -->
+				<img id="profile-picture" :src="githubProfile?.avatar_url" alt="profile pic" >
 				<div class="text">
-					<h3 id="profile-name" v-text="githubProfile.login" />
+					<h3 id="profile-name" v-text="githubProfile?.login" />
 					<p>Last Commit: </p>
 				</div>
 			</div>
-			<!-- <div id="calander" /> -->
 			<main>
-				<Canvas :year="selectedYear" ref="canvas" />
+				<Canvas :year="selectedYear" id="canvas" ref="canvas" />
 				<section id="year">
 					<p>Year</p>
 					<hr>
@@ -23,21 +22,20 @@
 						</li>
 					</ul>
 				</section>
-				<button @click="submit" id="submit" class="btn">Submit Contribution</button>
+				<button @click="submit" id="submit" class="btn" v-text="!editing ? 'Submit Contributions' : 'Edit Contributions'" />
 			</main>
 		</div>
 	</div>
 </template>
 
 <script>
-import GithubCalander from 'github-calendar';
 import Header from '../components/Header';
 import Canvas from '../components/Canvas';
 
-let userData = null, github_profile;
-let minYear = 2015;
+let userData = null;
 const currentYear = new Date().getFullYear();
 let selectedYear = currentYear;
+
 export default {
 	name: 'Dashboard',
 	components: {Header, Canvas},
@@ -48,7 +46,11 @@ export default {
 		const profileReq = await fetch('https://api.github.com/user', {headers: {'authorization': `token ${this.userData.access_token}`}});
 		if(profileReq.ok) {
 			this.githubProfile = await profileReq.json();
-			// GithubCalander('#calander', this.githubProfile.login, {responsive: true, global_stats: true, summary_text: ' '});
+			const minYear = new Date(this.githubProfile.created_at).getFullYear();
+			this.yearSpan = [];
+			for(let year = currentYear; year >= minYear; year--)
+				this.yearSpan.push(year);
+			this.selectYear();
 		} else if(profileReq.status == 401) { // If the GH app can no longer access this user anmore
 			localStorage.removeItem('userID');
 			// Delete the user from the db
@@ -56,17 +58,18 @@ export default {
 			this.$router.push('/');
 		}
 	},
-	data() {
-		let yearSpan = [];
-		for(let year = currentYear; year >= minYear; year--)
-			yearSpan.push(year);
-		return {userData, githubProfile: this.githubProfile, yearSpan, selectedYear};
+	data() {	
+		return {userData, githubProfile: this.githubProfile, yearSpan: this.yearSpan, selectedYear, editing: this.editing};
 	},
 	methods: {
 		async submit() {
+			let commitData = this.$refs.canvas.drawingBoard;
+			if(editing) {
+				console.log('editing');
+			}
 			const body = {
 				user: localStorage.getItem('userID'),
-				commitData: this.$refs.canvas.drawingBoard,
+				commitData,
 				year: this.selectedYear
 			};
 			try {
@@ -84,14 +87,21 @@ export default {
 		async selectYear() {
 			try {
 				const req = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph/${localStorage.getItem('userID')}/${this.selectedYear}`);
-				if(req.ok)
+				if(req.ok) {
 					this.$refs.canvas.drawingBoard = await req.json();
+					this.editing = true;
+					this.originalData = this.$refs.canvas.drawingBoard;
+				} else {
+					this.$refs.canvas.initialize();
+					this.editing = false;
+				}
 			} catch(e) {
 				console.error(e);
 			}
 		}
 	}
 };
+
 </script>
 
 <style scoped>
@@ -135,8 +145,8 @@ export default {
 		grid-template-columns: auto auto;
 		justify-items: start;
 	}
-	main #submit {
-		/* display: block; */
+	#canvas {
+		align-self: center;
 	}
 	#year {
 		padding: 0 1em;
