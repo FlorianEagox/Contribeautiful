@@ -28,11 +28,12 @@ router.post('/', async(req, res) => {
 	const {user, year, commitData} = req.body;
 	const userCol = db.get('users');
 	const {access_token} = await userCol.findOne({_id: user});
-	// Create a repo if the user doesn't already have one.
+	// Get the email and username of the logiged n user
 	const [{login}, [{email}]] = (await Promise.all([
 		(await fetch('https://api.github.com/user',        {headers: authHeader(access_token)})).json(),
 		(await fetch('https://api.github.com/user/public_emails',  {headers: authHeader(access_token)})).json()
 	]));
+	// Create a repo if the user doesn't already have one.
 	const repoReq = await fetch(`https://api.github.com/repos/${login}/contribeautiful_data`);
 	if(repoReq.status == 404) { // check if the repo exists
 		const repo = await fetch('https://api.github.com/user/repos', {
@@ -56,13 +57,26 @@ router.post('/', async(req, res) => {
 	const repo = await GitUtils.getRepo(login, access_token); // Clone or open the repo
 	const lastID = await GitUtils.makeCommits(repo, year, commitData, login, email); // Make all the commits and get the last ID
 	
-	const {graph} = await userCol.findOneAndUpdate({_id: user}, {$set: {lastCommit: lastID}});
+	const updatedUser = await userCol.findOneAndUpdate({_id: user}, {$set: {lastCommit: lastID}});
 	
 	res.status(201).send(lastID);
-
 });
 router.patch('/', async(req, res) => {
+	const {user, year, commitData} = req.body;
+	const userCol = db.get('users');
+	const {access_token, lastCommit} = await userCol.findOne({_id: user});
+	// Get the email and username of the logiged n user
+	const [{login}, [{email}]] = (await Promise.all([
+		(await fetch('https://api.github.com/user',        {headers: authHeader(access_token)})).json(),
+		(await fetch('https://api.github.com/user/public_emails',  {headers: authHeader(access_token)})).json()
+	]));
 
+	const repo = await GitUtils.getRepo(login, access_token, lastCommit); // Clone or open the repo
+	const lastID = await GitUtils.update(repo, year, commitData, login, email); // Make all the commits and get the last ID
+	if(lastID) // If any new commits were made, add the latest sha to the DB
+		await userCol.findOneAndUpdate({_id: user}, {$set: {lastCommit: lastID}});
+	
+	res.status(201).send(lastID);
 });
 const authHeader = token => {return {'Authorization': `token ${token}`}};
 

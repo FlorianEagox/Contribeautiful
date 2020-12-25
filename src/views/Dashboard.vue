@@ -96,7 +96,7 @@ export default {
 				if(req.ok) {
 					this.$refs.canvas.initialize(await req.json());
 					this.editing = true;
-					this.originalData = this.$refs.canvas.drawingBoard;
+					this.originalData = [...this.$refs.canvas.drawingBoard];
 				} else {
 					this.$refs.canvas.initialize();
 					this.editing = false;

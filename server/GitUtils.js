@@ -55,16 +55,21 @@ async function update(repo, year, commits, username, email) {
 	let lastCommit;
 	for(const numCommits in commits) { // loop through every day
 		const timestamp = Math.floor(currentDay.setDate(currentDay.getDate() + 1) / 1000); // go to the next day, storing the result as a UNIX timestamp
-		if(numCommits > 0) {
+		console.log(numCommits, commits[numCommits])
+		if(commits[numCommits] > 0) {
 			const signature = git.Signature.create(username, email, timestamp, 0); // generate a git signature
-			for(let i = 0; i < pixelToNumCommits(numCommits); i++) // make the specified number of commits for the day
+			for(let i = 0; i < pixelToNumCommits(commits[numCommits]); i++) // make the specified number of commits for the day
 				lastCommit = await makeCommit(repo, signature, username, `${currentDay.toISOString()}, commit ${i}`);
-			
 		}
 	}
+	await push(repo);
+	return lastCommit?.sha() || null;
+}
+
+// push to origin
+async function push(repo) {
 	const origin = await repo.getRemote('origin');
 	await origin.push(['refs/heads/main:refs/heads/main']);
-	return lastCommit.id();
 }
 
 // Gets the commits that happened during a given year
@@ -135,4 +140,4 @@ async function getGitHubProifle(access_token) {
 	return await (await fetch('https://api.github.com/user', {headers: {Authorization: `token ${access_token}`}})).json();
 }
 
-module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, getGitHubProifle};
+module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, update, getGitHubProifle};
