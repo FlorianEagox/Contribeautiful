@@ -9,8 +9,8 @@
 					<h3 id="profile-name" v-text="githubProfile?.login" />
 					<p>Last Commit:
 						<a 	id="last-commit"
-							:href="`https://github.com/${githubProfile.login}/contribeautiful_data/commit/${userData.lastCommit}`"
-							v-text="userData.lastCommit" />
+							:href="`https://github.com/${githubProfile?.login}/contribeautiful_data/commit/${userData?.lastCommit}`"
+							v-text="userData?.lastCommit" />
 					</p>
 				</div>
 			</div>
@@ -45,8 +45,13 @@ export default {
 	components: {Header, Canvas},
 	async created() {
 		const userID = localStorage.getItem('userID');
-		this.userData = await ( // Get the server's userdata
-			await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${userID}`)).json();
+		const userReq = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${userID}`);
+		if(!userReq.ok) {
+			localStorage.removeItem('userID');
+			location.reload();
+			return;
+		}
+		this.userData = await userReq.json();
 		const profileReq = await fetch('https://api.github.com/user', {headers: {'authorization': `token ${this.userData.access_token}`}});
 		if(profileReq.ok) {
 			this.githubProfile = await profileReq.json();
@@ -147,7 +152,9 @@ export default {
 	#user .text {
 		padding: 1em;
 	}
-
+	#user #last-commit {
+		color: hotpink ;
+	}
 	main {
 		display: grid;
 		grid-template-columns: auto auto;

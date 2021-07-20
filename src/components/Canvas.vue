@@ -91,6 +91,7 @@ export default {
 		},
 		initialize(drawingBoard = null) {
 			this.drawingBoard = drawingBoard || initializeEmptyCanvas(this.year);
+			console.log(drawingBoard);
 		},
 		yearStartOffset
 	}

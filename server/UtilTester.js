@@ -8,4 +8,26 @@ async function testAll() {
 	// const lastCommit = await GitUtils.makeCommits(repo, '2015', commitData, 'TheFoxarmy', 'seth@sethpainter.com')
 	GitUtils.commitsFromYear(repo, 2020, console.log);
 }
-testAll();
+
+async function testDelete() {
+	const repo = await Git.Repository.open('./rebase/.git');
+	const commit = await Git.Commit.lookup(repo, 'b7608a8791dd649d399f2c4a40eaedf199542503');
+	const rebase = Git.Rebase.init(repo, commit, null, await commit.parent(0));
+
+	// GitUtils.deleteCommit(repo, 'b7608a8791dd649d399f2c4a40eaedf199542503');
+}
+
+async function testNums(num) {
+	const repo = await Git.Repository.open('repos/TheFoxarmy');
+	const currentDay = new Date(2018, 9, 6);
+	currentDay.setDate(currentDay.getDate() - 1); // Current day = the next day
+	for(let day = 0; day < num; day++) {
+		const timestamp = Math.floor(currentDay.setDate(currentDay.getDate() + 1) / 1000);
+		const signature = Git.Signature.create('TheFoxarmy', 'seth@sethpainter.com', timestamp, 0); // generate a git signature
+		for(let i = 0; i < day; i++) 
+			await GitUtils.makeCommit(repo, signature, 'TheFoxarmy', `testing nums ${currentDay} ${i}`);
+	}
+	await GitUtils.push(repo);
+}
+
+testNums(12)

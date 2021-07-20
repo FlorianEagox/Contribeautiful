@@ -87,7 +87,7 @@ export default {
 	}
 	.btn-wrapper {
 		text-align: right;
-		margin-top: 2em;
+		margin: 2em 0 1em;
 	}
 	
 	#btn-learn {
