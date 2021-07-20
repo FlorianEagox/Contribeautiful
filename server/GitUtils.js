@@ -10,6 +10,7 @@ async function getRepo(username, accessToken, lastCommit = null) {
 		try {
 			return await git.Repository.open(`repos/${username}/.git`);
 		} catch(e) {
+			// For security reasons, we should NEVER pull the users's repo. They could use this to download unauthorized files on the server.
 			if(lastCommit) {
 				try {
 					const actualCommit = await fetch(`https://api.github.com/repos/${username}/${repoName}/commits`);
@@ -27,6 +28,7 @@ async function getRepo(username, accessToken, lastCommit = null) {
 			return await git.Clone(`https://${username}:${accessToken}@github.com/${username}/${repoName}`, `repos/${username}`);
 		}
 	} catch(e) {
+		console.error('Failed to return the repo!');
 		console.error(e);
 		return null;
 	}
@@ -153,4 +155,8 @@ async function getLatestCommit(repo) {
 	return (await repo.getCommit(head)).sha(); // get the commit for current state
 }
 
-module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, update, getGitHubProifle, deleteCommit, makeCommit, push};
+async function cloneRepo(username, accessToken) {
+	git.Clone(`https://${username}:${accessToken}@github.com/${username}/${repoName}`, `repos/${username}`);
+}
+
+module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, update, getGitHubProifle, deleteCommit, makeCommit, push, cloneRepo};

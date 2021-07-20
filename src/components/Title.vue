@@ -1,5 +1,8 @@
 <template>
-	<h1 id="title"><span id="contri">Contri</span><span id="beautiful">beautiful</span></h1>
+	<h1 id="title">
+		<span id="contri">Contri</span>
+		<span id="beautiful">beautiful</span>
+	</h1>
 </template>
 
 <script>
