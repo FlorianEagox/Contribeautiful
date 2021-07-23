@@ -34,31 +34,33 @@ async function getRepo(username, accessToken, lastCommit = null) {
 	}
 }
 
-async function makeCommits(repo, year, commits, username, email) {
+async function makeCommits(repo, year, commits, username, email, progress) {
 	const currentDay = new Date(year, 0, 1); // start with the first sunday of the year
 	currentDay.setDate(currentDay.getDate() - 1); // Current day = the next day
-	let lastCommit;
 	for(let numCommits in commits) { // loop through every day
 		const timestamp = Math.floor(currentDay.setDate(currentDay.getDate() + 1) / 1000); // go to the next day, storing the result as a UNIX timestamp
 		const signature = git.Signature.create(username, email, timestamp, 0); // generate a git signature
-		for(let i = 0; i < pixelToNumCommits(commits[numCommits]); i++) // make the specified number of commits for the day
-			lastCommit = await makeCommit(repo, signature, username, `${currentDay.toISOString()}, commit ${i}`);
+		for(let i = 0; i < pixelToNumCommits(commits[numCommits]); i++) { // make the specified number of commits for the day
+			await makeCommit(repo, signature, username, `${currentDay.toISOString()}, commit ${i}`);
+			progress[0]++;
+		}
 	}
-	
+
 	await push(repo);
-	
-	return getLatestCommit(repo);
+	return await getLatestCommit(repo);
 }
-async function update(repo, year, commits, username, email) {
+async function update(repo, year, commits, username, email, progress) {
+	progress[1] = computeTotalCommits(commits);
 	const currentDay = new Date(year, 0, 1);
 	currentDay.setDate(currentDay.getDate() - 1); // Current day = the next day
-	let lastCommit;
 	for(const numCommits in commits) { // loop through every day
 		const timestamp = Math.floor(currentDay.setDate(currentDay.getDate() + 1) / 1000); // go to the next day, storing the result as a UNIX timestamp
 		if(commits[numCommits] > 0) {
 			const signature = git.Signature.create(username, email, timestamp, 0); // generate a git signature
-			for(let i = 0; i < pixelToNumCommits(commits[numCommits]); i++) // make the specified number of commits for the day
-				lastCommit = await makeCommit(repo, signature, username, `${currentDay.toISOString()}, commit ${i}`);
+			for(let i = 0; i < pixelToNumCommits(commits[numCommits]); i++) { // make the specified number of commits for the day
+				await makeCommit(repo, signature, username, `${currentDay.toISOString()}, commit ${i}`);
+				progress[0]++;
+			}
 		} else if(commits[numCommits] < 0) {
 			// put some rebase shit
 		}
@@ -159,4 +161,8 @@ async function cloneRepo(username, accessToken) {
 	git.Clone(`https://${username}:${accessToken}@github.com/${username}/${repoName}`, `repos/${username}`);
 }
 
-module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, update, getGitHubProifle, deleteCommit, makeCommit, push, cloneRepo};
+function computeTotalCommits(commits) {
+	return commits.filter(commit => commit != 0).map(commit => pixelToNumCommits(Math.abs(commit))).reduce((commit, total) => commit + total);
+}
+
+module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, update, getGitHubProifle, deleteCommit, makeCommit, push, cloneRepo, computeTotalCommits};

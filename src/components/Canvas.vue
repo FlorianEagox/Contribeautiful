@@ -57,7 +57,6 @@ export default {
 	methods: {
 		colorDay(dayIndex) {
 			if(this.holdingDown) {
-				console.log('DRAWING!')
 				this.drawingBoard[dayIndex] = this.currentColor;
 			}
 		},
@@ -91,7 +90,6 @@ export default {
 		},
 		initialize(drawingBoard = null) {
 			this.drawingBoard = drawingBoard || initializeEmptyCanvas(this.year);
-			console.log(drawingBoard);
 		},
 		yearStartOffset
 	}
@@ -129,16 +127,6 @@ export default {
 		grid-auto-flow: column;
 		gap: 1px;
 		aspect-ratio: 52 / 7;
-	}
-	#chart .placeholder {
-		width: 1fr;
-		height: 1fr;
-		display: inline-block;
-	}
-	#chart .day {
-		width: 1fr;
-		height:1fr;
-		display: inline-block;
 	}
 	#chart .day:hover {
 		border: 1px solid grey;

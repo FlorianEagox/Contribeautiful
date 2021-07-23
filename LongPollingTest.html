@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script>
+	const url = 'http://sethpainter.com:3500/test';
+	(async () => {
+		const response = await fetch(url);
+		const reader = response.body.getReader();
+		const decoder = new TextDecoder();
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+
+			console.log(decoder.decode(value))
+		}
+		console.log('Done!')
+	})();
+
+	// XHR VERSION
+	const xhr = new XMLHttpRequest()
+	xhr.open("GET", url)
+	xhr.onprogress = function () {
+		console.log(xhr.responseText);
+	};
+	// xhr.send();
+</script>
+
+</html>

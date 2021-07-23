@@ -7,10 +7,11 @@
 				<img id="profile-picture" :src="githubProfile?.avatar_url" alt="profile pic" >
 				<div class="text">
 					<h3 id="profile-name" v-text="githubProfile?.login" />
-					<p>Last Commit:
+					<p v-if="lastCommit">Last Commit:
 						<a 	id="last-commit"
 							:href="`https://github.com/${githubProfile?.login}/contribeautiful_data/commit/${userData?.lastCommit}`"
-							v-text="userData?.lastCommit" />
+							target="_blank"
+							v-text="lastCommit" />
 					</p>
 				</div>
 			</div>
@@ -26,6 +27,11 @@
 						</li>
 					</ul>
 				</section>
+				<div id="progress-bar">
+					<div id="progress" :style="`width: ${Math.floor((progress / progressTotal) * 100)}%`">
+						<h3 id="progress-status">{{progress}} of {{progressTotal}} commits</h3>
+					</div>
+				</div>
 				<button @click="submit" id="submit" class="btn" v-text="!editing ? 'Submit Contributions' : 'Edit Contributions'" />
 			</main>
 		</div>
@@ -52,23 +58,34 @@ export default {
 			return;
 		}
 		this.userData = await userReq.json();
+		this.lastCommit = this.userData.lastCommit;
 		const profileReq = await fetch('https://api.github.com/user', {headers: {'authorization': `token ${this.userData.access_token}`}});
 		if(profileReq.ok) {
 			this.githubProfile = await profileReq.json();
-			const minYear = new Date(this.githubProfile.created_at).getFullYear();
+			const minYear = new Date(this.githubProfile.created_at).getFullYear(); // Only show years after the profile was created.
 			this.yearSpan = [];
 			for(let year = currentYear; year >= minYear; year--)
 				this.yearSpan.push(year);
 			this.selectYear();
-		} else if(profileReq.status == 401) { // If the GH app can no longer access this user anmore
+		} else if(profileReq.status == 401) { // If the GH app can no longer access this user anymore
 			localStorage.removeItem('userID');
 			// Delete the user from the db
 			await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${userID}`, {method: 'DELETE'});
 			this.$router.push('/');
 		}
 	},
-	data() {	
-		return {userData, githubProfile: this.githubProfile, yearSpan: this.yearSpan, selectedYear, editing: this.editing};
+
+	data() {
+		return {
+			userData,
+			githubProfile: this.githubProfile,
+			yearSpan: this.yearSpan,
+			selectedYear,
+			editing: this.editing,
+			lastCommit: '',
+			progress: 0,
+			progressTotal: 100
+		};
 	},
 	methods: {
 		async submit() {
@@ -84,13 +101,27 @@ export default {
 				year: this.selectedYear
 			};
 			try {
-				const req = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph`, {
+				const response = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/graph`, {
 					method,
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(body)
 				});
-				if(req.ok)
-					console.log(await req.text());
+				const reader = response.body.getReader();
+				const decoder = new TextDecoder();
+				while (true) {
+					let { done, value } = await reader.read();
+					if (done) break;
+					value = decoder.decode(value);
+					if(value.includes('total'))
+						this.progressTotal = value.split(' ')[1];
+					else if(value.includes('lastid'))
+						this.lastCommit = value.split(' ')[1];
+					else
+						this.progress = value;
+
+				}
+				if(response.ok)
+					this.selectYear();
 			} catch(e) {
 				console.error(e);
 			}
@@ -183,5 +214,30 @@ export default {
 	}
 	#year label:hover {
 		background: #666;
+	}
+
+	#progress-bar {
+		width: 100%;
+		height: 3em;
+		background: #bbb;
+		grid-row: 3;
+		border-radius: 30px;
+		margin-top: 1em;
+		overflow: hidden;
+	}
+	#progress {
+		background-image: linear-gradient(90deg, hotpink, limegreen);
+		height: 100%;
+		border-radius: 30px;
+		margin: auto;
+		display: grid;
+		place-items: center;
+		position: relative;
+	}
+	#progress-status {
+		position: absolute;
+		overflow: visible;
+		white-space: nowrap;
+		text-shadow: 0 0 3px #111;
 	}
 </style>
