@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div class="container" ref="main">
 		<Header />
 		<h1 id="lbl-dashboard">Dashboard</h1>
 		<div class="wrapper">
@@ -15,7 +15,7 @@
 					</p>
 				</div>
 			</div>
-			<main>
+			<main ref="main">
 				<Canvas :year="selectedYear" id="canvas" ref="canvas" />
 				<section id="year">
 					<p>Year</p>
@@ -27,11 +27,7 @@
 						</li>
 					</ul>
 				</section>
-				<div id="progress-bar">
-					<div id="progress" :style="`width: ${Math.floor((progress / progressTotal) * 100)}%`">
-						<h3 id="progress-status">{{progress}} of {{progressTotal}} commits</h3>
-					</div>
-				</div>
+				<ProgressBar :total="progressTotal" :progress="progress" :hidden="progressHidden" />
 				<button @click="submit" id="submit" class="btn" v-text="!editing ? 'Submit Contributions' : 'Edit Contributions'" />
 			</main>
 		</div>
@@ -41,6 +37,9 @@
 <script>
 import Header from '../components/Header';
 import Canvas from '../components/Canvas';
+import ProgressBar from '../components/ProgressBar';
+import Toast from '../components/Toast';
+import {createApp} from 'vue';
 
 let userData = null;
 const currentYear = new Date().getFullYear();
@@ -48,7 +47,7 @@ let selectedYear = currentYear;
 
 export default {
 	name: 'Dashboard',
-	components: {Header, Canvas},
+	components: {Header, Canvas, ProgressBar},
 	async created() {
 		const userID = localStorage.getItem('userID');
 		const userReq = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${userID}`);
@@ -74,7 +73,12 @@ export default {
 			this.$router.push('/');
 		}
 	},
-
+	mounted() {
+		const errorToast = createApp(Toast, { text: `Something went wrong!`});
+		const mountPoint = document.createElement('div');
+		errorToast.mount(mountPoint);
+		this.$refs.main.appendChild(mountPoint);
+	},
 	data() {
 		return {
 			userData,
@@ -84,11 +88,13 @@ export default {
 			editing: this.editing,
 			lastCommit: '',
 			progress: 0,
-			progressTotal: 100
+			progressTotal: 100,
+			progressHidden: true
 		};
 	},
 	methods: {
 		async submit() {
+			this.progressHidden = false;
 			let commitData = this.$refs.canvas.drawingBoard;
 			let method = 'POST';
 			if(this.editing) {
@@ -108,23 +114,23 @@ export default {
 				});
 				const reader = response.body.getReader();
 				const decoder = new TextDecoder();
-				while (true) {
+				while (true) { // Continously run the loop while the request is ongoing
 					let { done, value } = await reader.read();
-					if (done) break;
-					value = decoder.decode(value);
-					if(value.includes('total'))
-						this.progressTotal = value.split(' ')[1];
-					else if(value.includes('lastid'))
+					if (done) break; // When the request compltes, stop updating the progress bar
+					value = decoder.decode(value); // Converts from Unit8 Array to text
+					if(value.includes('total')) // the total ammount of commits to be made
+						this.progressTotal = value.split(' ')[1]; 
+					else if(value.includes('lastid')) // The last thing transmitted, and the final commit made
 						this.lastCommit = value.split(' ')[1];
 					else
-						this.progress = value;
-
+						this.progress = value; // Update the progress bar
 				}
 				if(response.ok)
-					this.selectYear();
+					this.selectYear(); // This triggers the client to update and shows the user that their commits have been made.
 			} catch(e) {
 				console.error(e);
 			}
+			this.progressHidden = true; // hide the progress bar when the requst is done
 		},
 		async selectYear() {
 			try {
@@ -139,6 +145,7 @@ export default {
 				}
 			} catch(e) {
 				console.error(e);
+				
 			}
 		}
 	}
@@ -214,30 +221,5 @@ export default {
 	}
 	#year label:hover {
 		background: #666;
-	}
-
-	#progress-bar {
-		width: 100%;
-		height: 3em;
-		background: #bbb;
-		grid-row: 3;
-		border-radius: 30px;
-		margin-top: 1em;
-		overflow: hidden;
-	}
-	#progress {
-		background-image: linear-gradient(90deg, hotpink, limegreen);
-		height: 100%;
-		border-radius: 30px;
-		margin: auto;
-		display: grid;
-		place-items: center;
-		position: relative;
-	}
-	#progress-status {
-		position: absolute;
-		overflow: visible;
-		white-space: nowrap;
-		text-shadow: 0 0 3px #111;
 	}
 </style>
