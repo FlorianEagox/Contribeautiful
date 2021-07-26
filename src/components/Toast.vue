@@ -1,29 +1,31 @@
 <template>
-	<div class="toast" :style="`animation-delay: ${TTL}.0s`">
-		{{text}}
-	</div>
+	<div :class="['toast', status]" :style="`animation-delay: ${TTL}.0s`" v-text="text" />
 </template>
 
 <script>
 export default {
-	name: 'Toast',
-	props: {text: String, 'TTL': {default: 3}},
+	props: {
+		text: String,
+		TTL: {default: 5},
+		status: {default: 'error'}
+	},
 	created() {
 		if(this.TTL > 0)
 			setTimeout(() => {
-				document.remove(this.$el)
-				this.$.appContext.app.unmount(); // Probably a dumb way to remove it, but IDK a better one in Vue 3 ;_;
+				this.$el.parentNode.parentNode.removeChild(this.$el.parentNode);
 			}, this.TTL * 1000 + 2000);
 	},
-}
+};
 </script>
 
 <style scoped>
 	.toast {
-		border-radius: 5px;
-		padding: 0.1em 0.3em;
+		border-radius: 10px;
+		padding: 0.2em 0.5em;
 		animation: fade-out 2.0s forwards;
-		margin: 1em 0;
+		margin: 1em auto;
+		max-width: 500px;
+
 	}
 	.toast.success {
 		background: green;

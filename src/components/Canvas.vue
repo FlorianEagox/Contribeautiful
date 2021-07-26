@@ -31,6 +31,10 @@
 			</div>
 			<button id="btn-clear" @click="clear">Clear</button>
 		</div>
+		<a id="gh-link" target="_blank" 
+			:href="`https://github.com/${username}?tab=overview&from=${year}-12-01`">
+			View the graph on GitHub
+		</a>
 	</section>
 </template>
 
@@ -45,7 +49,7 @@ const darkColors  = ['161b22', '01311f', '034525', '0f6d31', '00c647'];
 const colors = lightColors;
 export default {
 	name: 'Canvas',
-	props: ['year'],
+	props: ['year', 'username'],
 	created() {
 		window.setGraph = graph => this.drawingBoard = graph;
 		window.getGraph = () => this.drawingBoard;
@@ -143,5 +147,9 @@ export default {
 	.selected {
 		border: 1px solid blue;
 		margin: 1px;
+	}
+	#gh-link, #gh-link:visited {
+		color: hotpink;
+		display: block;
 	}
 </style>

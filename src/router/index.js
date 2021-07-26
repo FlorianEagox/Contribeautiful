@@ -6,9 +6,7 @@ const routes = [
 	{
 		path: '/',
 		name: 'Home',
-		component() {
-			return (localStorage.getItem('userID')) ? Dashboard : Homepage;
-		}
+		component: localStorage.getItem('userID') ? Dashboard : Homepage
 	},
 	{
 		path: '/:id',

@@ -8,17 +8,14 @@
 		margin: 0;
 		padding: 0;
 		box-sizing: border-box;
+		/* border: 1px solid white; */
 	}
 	:root, body, #app, .container {
-		height: 100%;
 		overflow: auto;
 	}
 	body {
 		font-family: poppins;
 		background: #444;
-		/* background-image: url("/fabric_bkg.jpg"); */
-		background-repeat: no-repeat;
-		background-size: cover;
 		color: white;
 	}
 
