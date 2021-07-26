@@ -36,4 +36,13 @@
 		color: rgba(0, 0, 0, .8);
 		background: white;
 	}
+	.btn-red {
+		background: maroon;
+		color: white;
+		border: none;
+	}
+	.btn-red:hover {
+		background: white;
+		color: maroon;
+	}
 </style>

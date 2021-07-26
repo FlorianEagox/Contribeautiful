@@ -101,33 +101,33 @@ async function commitsFromYear(repo, year, callback) {
 // map the color of the number of commits to match GitHub's minimum contriutions for that color.
 function pixelToNumCommits(color) {
 	switch(color) {
-		case 1:
-			return 1;
-		case 2:
-			return 3;
-		case 3:
-			return 6;
-		case 4:
-			return 9;
+	case 1:
+		return 1;
+	case 2:
+		return 3;
+	case 3:
+		return 6;
+	case 4:
+		return 9;
 	}
 }
 function commitNumToPixels(commitNum) {
 	switch(commitNum) {
-		case 1:
-			return 1;
-		case 3:
-			return 2;
-		case 6:
-			return 3;
-		case 9:
-			return 4;
-		default:
-			return 0;
+	case 1:
+		return 1;
+	case 3:
+		return 2;
+	case 6:
+		return 3;
+	case 9:
+		return 4;
+	default:
+		return 0;
 	}
 }
 
 async function makeCommit(repo, signature, dirName, message=' ') {
-	const head = await git.Reference.nameToId(repo, "HEAD"); // get reference to the current state
+	const head = await git.Reference.nameToId(repo, 'HEAD'); // get reference to the current state
 	const parent = await repo.getCommit(head); // get the commit for current state
 
 	// Write to a file w/ name of the last commit sha, so we have a unique file for every commit
@@ -140,7 +140,7 @@ async function makeCommit(repo, signature, dirName, message=' ') {
 	const changes = await index.writeTree(); // get reference to a set of changes
 	
 	// combine all info into commit and return hash
-	const commit = await repo.createCommit("HEAD", signature, signature, `commit ${message}`, changes, [parent]);
+	const commit = await repo.createCommit('HEAD', signature, signature, `commit ${message}`, changes, [parent]);
 	return commit;
 }
 
@@ -153,7 +153,7 @@ async function deleteCommit(repo, commitID) {
 }
 
 async function getLatestCommit(repo) {
-	const head = await git.Reference.nameToId(repo, "HEAD"); // get reference to the current state
+	const head = await git.Reference.nameToId(repo, 'HEAD'); // get reference to the current state
 	return (await repo.getCommit(head)).sha(); // get the commit for current state
 }
 
@@ -165,4 +165,4 @@ function computeTotalCommits(commits) {
 	return commits.filter(commit => commit != 0).map(commit => pixelToNumCommits(Math.abs(commit))).reduce((commit, total) => commit + total);
 }
 
-module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, update, getGitHubProifle, deleteCommit, makeCommit, push, cloneRepo, computeTotalCommits};
+module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, update, getGitHubProifle, deleteCommit, makeCommit, push, cloneRepo, computeTotalCommits, getLatestCommit};

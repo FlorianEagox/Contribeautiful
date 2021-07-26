@@ -158,7 +158,7 @@ export default {
 			errorToast.mount(mountPoint);
 			this.$refs.main.insertAdjacentElement('afterend', mountPoint);
 			return mountPoint;
-		}
+		},
 	}
 };
 </script>

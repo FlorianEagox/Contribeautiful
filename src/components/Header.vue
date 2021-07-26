@@ -3,17 +3,31 @@
 		<div id="container">
 			<img id="logo" src="@/assets/contribeautiful.svg" alt="logo">
 			<Title />
-			<button class="btn" id="logout">Logout</button>
+			<button class="btn btn-red" id="logout" @click="openLogout">
+				<i class="fas fa-sign-out-alt"></i>
+				Logout
+			</button>
 		</div>
 	</header>
 </template>
 
 <script>
 import Title from './Title';
+import LogoutModal from './LogoutModal.vue';
+import { createApp } from 'vue';
 export default {
 	name: 'Header',
-	components: {Title}
-}
+	components: {Title},
+	methods: {
+		openLogout() {
+			const modal = createApp(LogoutModal);
+			const mountPoint = document.createElement('div');
+			modal.mount(mountPoint);
+			document.body.appendChild(mountPoint);
+			return mountPoint;
+		}
+	}
+};
 </script>
 
 <style scoped>
@@ -30,12 +44,10 @@ export default {
 	}
 	header #logo {
 		width: 60px;
+		margin: 0.5em;
 	}
 	#logout {
 		margin-left: auto;
 		margin-top: inherit;
-		background: maroon;
-		color: white;
-		border: none;
 	}
 </style>
