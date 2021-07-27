@@ -17,10 +17,11 @@ import LogoutModal from './LogoutModal.vue';
 import { createApp } from 'vue';
 export default {
 	name: 'Header',
+	props: ['username'],
 	components: {Title},
 	methods: {
 		openLogout() {
-			const modal = createApp(LogoutModal);
+			const modal = createApp(LogoutModal, {username: this.username});
 			const mountPoint = document.createElement('div');
 			modal.mount(mountPoint);
 			document.body.appendChild(mountPoint);

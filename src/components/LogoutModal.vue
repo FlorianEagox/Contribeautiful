@@ -20,11 +20,13 @@
 <script>
 export default {
 	name: 'LogoutModal',
-	props: [],
+	props: ['username'],
 	methods: {
-		logout() {
+		async logout() {
+			await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${localStorage.getItem('userID')}`, {method: 'DELETE'});
 			localStorage.removeItem('userID');
 			location.reload();
+			window.open(`https://github.com/${this.username}/contribeautiful_data/settings#danger-zone`, '_blank');
 		},
 		cancel() {
 			this.$el.parentNode.parentNode.removeChild(this.$el.parentNode);

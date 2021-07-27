@@ -12,24 +12,28 @@ router.get('/', async(req, res) => {
 		res.send('No code :(');
 		return;
 	}
+
 	const params = new URLSearchParams();
 	params.append('client_id', process.env.VUE_APP_GH_CLIENT_ID);
 	params.append('client_secret', process.env.GH_CLIENT_SECRET);
 	params.append('code', req.query.code);
-	console.log(params)
+
 	const tokenRequest = await fetch(tokenUrl, { // request to get auth token
 		method: 'POST', 
 		headers: { 'Accept': 'application/json' }, 
 		body: params
 	});
+
 	if (!tokenRequest.ok) {
 		res.status(500).send('Oopsie Poopsie, something went wrong!');
 		return;
 	}
 
 	const {access_token} = await tokenRequest.json();
-	
 	const {login, id} = GitUtils.getGitHubProifle(access_token);
+
+	const users = db.get('users');
+	const user = await users.findOneAndUpdate({github_id: id}, {$set: {access_token}}, {upsert: true});
 
 	// Create a repo if the user doesn't already have one.
 	const repoReq = await fetch(`https://api.github.com/repos/${login}/contribeautiful_data`);
@@ -49,16 +53,13 @@ router.get('/', async(req, res) => {
 					auto_init: true
 				})
 			});
-			await GitUtils.cloneRepo();
+			await GitUtils.cloneRepo(login, access_token, user._id);
 		} catch(e) {
 			res.status(500).send('Failed to create repo');
 			return;
 		}
 	}
 
-	const users = db.get('users');
-
-	const user = await users.findOneAndUpdate({github_id: id}, {$set: {access_token}}, {upsert: true});
 	res.redirect(`${clientUrl}/${user._id}`);
 	db.close();
 });

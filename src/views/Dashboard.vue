@@ -1,5 +1,5 @@
 <template>
-	<Header />		
+	<Header :username="githubProfile?.login" />		
 	<div class="container" ref="main">
 		<h1 id="lbl-dashboard">Dashboard</h1>
 		<div id="user">
@@ -121,6 +121,11 @@ export default {
 						this.progressTotal = value.split(' ')[1]; 
 					else if(value.includes('lastid')) // The last thing transmitted, and the final commit made
 						this.lastCommit = value.split(' ')[1];
+					else if(value.includes('error')) {
+						console.error(value);
+						this.makeToast(`Something went wrong!\n ${value}`);
+						return;
+					}
 					else
 						this.progress = value; // Update the progress bar
 				}

@@ -6,10 +6,9 @@ const users = db.get('users');
 
 router.get('/:id', async(req, res) => {
 	const id = req.params.id;
-	if(!ObjectId.isValid(id)) {
-		res.sendStatus(400);
-		return;
-	}
+	if(!ObjectId.isValid(id))
+		return res.sendStatus(400);
+
 	const user = await users.findOne({_id: req.params.id});
 	
 	if(user)
@@ -18,14 +17,13 @@ router.get('/:id', async(req, res) => {
 		res.sendStatus(404);
 	db.close();
 });
+
 router.delete('/:id', async(req, res) => {
 	const id = req.params.id;
-	if(!ObjectId.isValid(id)) {
-		res.sendStatus(400);
-		return;
-	}
+	if(!ObjectId.isValid(id))
+		return res.sendStatus(400);
+
 	const user = await users.deleteOne({_id: id});
 	res.sendStatus(user ? 204 : 404);
-	db.get('graphs').deleteOne({_id: id});
 });
 module.exports = router;

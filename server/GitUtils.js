@@ -3,12 +3,13 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 
 const {firstWeekSunday} = require('../Utils');
+const { id } = require('monk');
 
 const repoName = 'contribeautiful_data';
-async function getRepo(username, accessToken, lastCommit = null) {
+async function getRepo(username, accessToken, userID, lastCommit = null) {
 	try {
 		try {
-			return await git.Repository.open(`repos/${username}/.git`);
+			return await git.Repository.open(`repos/${userID}/.git`);
 		} catch(e) {
 			// For security reasons, we should NEVER pull the users's repo. They could use this to download unauthorized files on the server.
 			if(lastCommit) {
@@ -25,49 +26,36 @@ async function getRepo(username, accessToken, lastCommit = null) {
 					return null;
 				}
 			}
-			return await git.Clone(`https://${username}:${accessToken}@github.com/${username}/${repoName}`, `repos/${username}`);
+			return await cloneRepo(username, accessToken, userID);
 		}
 	} catch(e) {
-		console.error('Failed to return the repo!');
-		console.error(e);
+		console.error('Failed to return the repo!', e);
 		return null;
 	}
 }
 
-async function makeCommits(repo, year, commits, username, email, progress) {
+async function makeCommits(repo, year, commits, username, email, userID, progress) {
 	const currentDay = new Date(year, 0, 1); // start with the first sunday of the year
 	currentDay.setDate(currentDay.getDate() - 1); // Current day = the next day
-	for(let numCommits in commits) { // loop through every day
-		const timestamp = Math.floor(currentDay.setDate(currentDay.getDate() + 1) / 1000); // go to the next day, storing the result as a UNIX timestamp
-		const signature = git.Signature.create(username, email, timestamp, 0); // generate a git signature
-		for(let i = 0; i < pixelToNumCommits(commits[numCommits]); i++) { // make the specified number of commits for the day
-			await makeCommit(repo, signature, username, `${currentDay.toISOString()}, commit ${i}`);
-			progress[0]++;
-		}
-	}
-
-	await push(repo);
-	return await getLatestCommit(repo);
-}
-async function update(repo, year, commits, username, email, progress) {
-	progress[1] = computeTotalCommits(commits);
-	const currentDay = new Date(year, 0, 1);
-	currentDay.setDate(currentDay.getDate() - 1); // Current day = the next day
-	for(const numCommits in commits) { // loop through every day
-		const timestamp = Math.floor(currentDay.setDate(currentDay.getDate() + 1) / 1000); // go to the next day, storing the result as a UNIX timestamp
-		if(commits[numCommits] > 0) {
-			const signature = git.Signature.create(username, email, timestamp, 0); // generate a git signature
-			for(let i = 0; i < pixelToNumCommits(commits[numCommits]); i++) { // make the specified number of commits for the day
-				await makeCommit(repo, signature, username, `${currentDay.toISOString()}, commit ${i}`);
-				progress[0]++;
+	try {
+		for(let numCommits in commits) { // loop through every day
+			const timestamp = Math.floor(currentDay.setDate(currentDay.getDate() + 1) / 1000); // go to the next day, storing the result as a UNIX timestamp
+			if(commits[numCommits] > 0) {
+				const signature = git.Signature.create(username, email, timestamp, 0); // generate a git signature
+				for(let i = 0; i < pixelToNumCommits(commits[numCommits]); i++) { // make the specified number of commits for the day
+					await makeCommit(repo, signature, userID, `${currentDay.toISOString()}, commit ${i}`);
+					progress[0]++;
+				}
 			}
-		} else if(commits[numCommits] < 0) {
-			// put some rebase shit
 		}
+		progress[0] = 'pushing...';
+		await push(repo);
+		return await getLatestCommit(repo);
+	} catch(e) {
+		throw { errorID: 3, message: `Something went wrong trying to make commits\n ${e}` };
 	}
-	await push(repo);
-	return await getLatestCommit(repo);
 }
+
 
 // push to origin
 async function push(repo) {
@@ -132,7 +120,7 @@ async function makeCommit(repo, signature, dirName, message=' ') {
 
 	// Write to a file w/ name of the last commit sha, so we have a unique file for every commit
 	// This method allows us to easily "delete" commits during rebase
-	fs.writeFileSync(`repos/${dirName}/${parent.sha()}`, `\n\ncommit ${message}`);
+	fs.writeFileSync(`repos/${dirName}/${parent.sha()}`, `commit ${message}`);
 	
 	const index = await repo.refreshIndex(); // read latest
 	await index.addByPath(parent.sha()); // stage changes to readme
@@ -157,12 +145,12 @@ async function getLatestCommit(repo) {
 	return (await repo.getCommit(head)).sha(); // get the commit for current state
 }
 
-async function cloneRepo(username, accessToken) {
-	git.Clone(`https://${username}:${accessToken}@github.com/${username}/${repoName}`, `repos/${username}`);
+async function cloneRepo(username, accessToken, userID) {
+	git.Clone(`https://${username}:${accessToken}@github.com/${username}/${repoName}`, `repos/${userID}`);
 }
 
 function computeTotalCommits(commits) {
-	return commits.filter(commit => commit != 0).map(commit => pixelToNumCommits(Math.abs(commit))).reduce((commit, total) => commit + total);
+	return commits.filter(commit => commit != 0).map(commit => pixelToNumCommits(Math.abs(commit))).reduce((commit, total) => commit + total, 0);
 }
 
-module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, update, getGitHubProifle, deleteCommit, makeCommit, push, cloneRepo, computeTotalCommits, getLatestCommit};
+module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, getGitHubProifle, deleteCommit, makeCommit, push, cloneRepo, computeTotalCommits, getLatestCommit};

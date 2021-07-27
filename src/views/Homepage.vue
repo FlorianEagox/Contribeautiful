@@ -55,7 +55,7 @@ export default {
 			if(reqUser.ok) {
 				const userData = await reqUser.json();
 				localStorage.setItem('userID', userData._id);
-				this.$router.push('/');
+				location = location.href.split('/').slice(0, -1).join('/'); // Return the URL without the last / so we don't resend the code.
 			} else if(reqUser.status == 404) {
 				console.log('oof!');
 			}
