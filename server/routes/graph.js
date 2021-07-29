@@ -17,12 +17,11 @@ router.get('/:user/:year', async(req, res) => {
 		return res.status(404);
 	const {login} = await GitUtils.getGitHubProifle(access_token); // Resolves our access token to a github userID
 	const repo = await GitUtils.getRepo(login, access_token, req.params.user); // open the repo of the user
-	GitUtils.commitsFromYear(repo, year, data => { // go through every commit in the repo, and make a list of every date in the year with the value of how many comits happend on that day.
-		if(!data?.every(item => item == 0))
-			res.send(JSON.stringify(data));
-		else
-			res.status(404).send();
-	});
+	const data = await GitUtils.commitsBetweenDates(repo, new Date(year,  0,  1), new Date(year, 11, 31)); // go through every commit in the repo, and make a list of every date in the year with the value of how many comits happend on that day.
+	if(!data?.every(item => item == 0))
+		res.send(JSON.stringify(data));
+	else
+		res.status(404).send();
 });
 
 router.post('/', updateGraph);

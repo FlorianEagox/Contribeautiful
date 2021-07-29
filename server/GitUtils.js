@@ -1,11 +1,10 @@
 const git = require('nodegit');
 const fs = require('fs');
 const fetch = require('node-fetch');
-
 const {firstWeekSunday} = require('../Utils');
-const { id } = require('monk');
-
+const { exec } = require('child_process');
 const repoName = 'contribeautiful_data';
+
 async function getRepo(username, accessToken, userID, lastCommit = null) {
 	try {
 		try {
@@ -46,71 +45,22 @@ async function makeCommits(repo, year, commits, username, email, userID, progres
 					await makeCommit(repo, signature, userID, `${currentDay.toISOString()}, commit ${i}`);
 					progress[0]++;
 				}
+			} else if(commits[numCommits] < 0) {
+				const originalCommits = await commitsFromDay(repo, currentDay);
+				const numRebases = originalCommits.length - pixelToNumCommits(commitNumToPixels(originalCommits.length) - Math.abs(commits[numCommits])); // because it's negative
+				originalCommits[originalCommits.length - 1].parentId(0).tostrS();
+				exec(`git --git-dir repos/${userID}/.git rebase ${await originalCommits[originalCommits.length - 1].sha()} --onto ${originalCommits[originalCommits.length - 1].parentId(0).tostrS()}`,
+					(e, result, error) => {
+						console.log ({e, result, error});
+					});
 			}
 		}
 		progress[0] = 'pushing...';
-		await push(repo);
+		// await push(repo);
 		return await getLatestCommit(repo);
 	} catch(e) {
+		console.error(e);
 		throw { errorID: 3, message: `Something went wrong trying to make commits\n ${e}` };
-	}
-}
-
-
-// push to origin
-async function push(repo) {
-	await (await repo.getRemote('origin')).push(['refs/heads/main:refs/heads/main']);
-}
-
-// Gets the commits that happened during a given year
-async function commitsFromYear(repo, year, callback) {
-	const first = await repo.getBranchCommit('main'); // get the first commit in the repo
-	const history = first.history();
-	
-	history.on('end', commits => { // called when commits are loaded?
-		const minDate = new Date(year,  0,  1).getTime(); // timestamp first date of year
-		const maxDate = new Date(year, 11, 31).getTime(); // timestamp last date of year
-		let currentDay = new Date(year,  0,  1); // create date object to check every day of year
-		const datesInRange = commits.map(commit => commit.date().getTime()).filter(date => minDate <= date && date <= maxDate) // Map all the commits in that year to just their times
-			.reduce((obj, b) => { // Get them as just an object of how many times they occour
-				obj[b] = ++obj[b] || 1;
-				return obj;
-			}, {});
-		const commitsPerDay = [];
-		while(currentDay.getTime() <= maxDate) {
-			commitsPerDay.push(commitNumToPixels(datesInRange[currentDay.getTime()]));
-			currentDay.setDate(currentDay.getDate() + 1);
-		}
-		callback(commitsPerDay);
-	});
-	history.start();
-}
-
-// map the color of the number of commits to match GitHub's minimum contriutions for that color.
-function pixelToNumCommits(color) {
-	switch(color) {
-	case 1:
-		return 1;
-	case 2:
-		return 3;
-	case 3:
-		return 6;
-	case 4:
-		return 9;
-	}
-}
-function commitNumToPixels(commitNum) {
-	switch(commitNum) {
-	case 1:
-		return 1;
-	case 3:
-		return 2;
-	case 6:
-		return 3;
-	case 9:
-		return 4;
-	default:
-		return 0;
 	}
 }
 
@@ -132,12 +82,88 @@ async function makeCommit(repo, signature, dirName, message=' ') {
 	return commit;
 }
 
-async function getGitHubProifle(access_token) {
-	return await (await fetch('https://api.github.com/user', {headers: {Authorization: `token ${access_token}`}})).json();
+async function deleteCommit(repo, commit) {
+	// git.Rebase.init(repo, commit, )
 }
 
-async function deleteCommit(repo, commitID) {
-	
+async function push(repo) {
+	await (await repo.getRemote('origin')).push(['refs/heads/main:refs/heads/main']);
+}
+
+// Functions mostly for getting data, not creating it.
+
+// Gets the commits that happened during a given year
+async function commitsBetweenDates(repo, minDate, maxDate, outCommits) {
+	return new Promise( async(res, rej) => {
+		const first = await repo.getBranchCommit('main'); // get the first commit in the repo
+		const history = first.history();
+		
+		history.on('end', commits => { // called when commits are loaded?
+			const minTime = minDate.getTime();
+			const maxTime = maxDate.getTime();
+			let currentDay = minDate; // the current date of the range
+			let commitsFromDay = commits.filter(commit => minTime <= commit.date().getTime() && commit.date().getTime() <= maxTime);
+			if(outCommits) outCommits[0] = commitsFromDay;
+			const datesInRange = commitsFromDay.map(commit => commit.date().getTime()) // Map all the commits in that range to just their times
+				.reduce((obj, b) => { // Get them as just an object of how many times they occour
+					obj[b] = ++obj[b] || 1; // When the date's already in the array, add to it, otherwise, put it in there with the intial value of one occourance.
+					return obj;
+				}, {});
+			const commitsPerDay = [];
+			while(currentDay.getTime() < maxTime) {
+				commitsPerDay.push(commitNumToPixels(datesInRange[currentDay.getTime()]));
+				currentDay.setDate(currentDay.getDate() + 1);
+			}
+			res(commitsPerDay);
+		});
+		history.start();
+	});
+}
+
+async function commitsFromDay(repo, day) {
+	return new Promise(async(res, rej) => {
+		const first = await repo.getBranchCommit('main'); // get the first commit in the repo
+		const history = first.history();
+		
+		history.on('end', commits => { // called when commits are loaded?
+			res(commits.filter(commit => day.getTime() == commit.date().getTime()));
+		});
+		history.start();
+	});
+}
+
+// map the color of the number of commits to match GitHub's minimum contriutions for that color.
+function pixelToNumCommits(color) {
+	switch(color) {
+	case 1:
+		return 1;
+	case 2:
+		return 3;
+	case 3:
+		return 6;
+	case 4:
+		return 9;
+	default:
+		return 0;
+	}
+}
+function commitNumToPixels(commitNum) {
+	switch(commitNum) {
+	case 1:
+		return 1;
+	case 3:
+		return 2;
+	case 6:
+		return 3;
+	case 9:
+		return 4;
+	default:
+		return 0;
+	}
+}
+
+async function getGitHubProifle(access_token) {
+	return await (await fetch('https://api.github.com/user', {headers: {Authorization: `token ${access_token}`}})).json();
 }
 
 async function getLatestCommit(repo) {
@@ -153,4 +179,4 @@ function computeTotalCommits(commits) {
 	return commits.filter(commit => commit != 0).map(commit => pixelToNumCommits(Math.abs(commit))).reduce((commit, total) => commit + total, 0);
 }
 
-module.exports = {getRepo, makeCommits, firstWeekSunday, commitsFromYear, getGitHubProifle, deleteCommit, makeCommit, push, cloneRepo, computeTotalCommits, getLatestCommit};
+module.exports = {getRepo, makeCommits, firstWeekSunday, commitsBetweenDates, getGitHubProifle, deleteCommit, makeCommit, push, cloneRepo, computeTotalCommits, getLatestCommit};

@@ -100,6 +100,7 @@ export default {
 				commitData = commitData.map((newVal, index) => newVal - this.originalData[index]);
 				method = 'PATCH';
 			}
+			console.log(commitData);
 			const body = {
 				user: localStorage.getItem('userID'),
 				commitData,

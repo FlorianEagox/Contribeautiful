@@ -1,5 +1,5 @@
 <template>
-	<div id="progress-bar" :class="{hidden}">
+	<div v-if="progress && total" id="progress-bar" :class="{hidden}">
 		<div id="progress" :style="`width: ${Math.floor((progress / total) * 100)}%`">
 			<h3 id="progress-status">
 				<span v-if="!progress.includes('push')">{{progress}} of {{total}} commits</span>
