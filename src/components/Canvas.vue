@@ -49,19 +49,20 @@ const darkColors  = ['161b22', '01311f', '034525', '0f6d31', '00c647'];
 const colors = lightColors;
 export default {
 	name: 'Canvas',
-	props: ['year', 'username'],
+	props: ['year', 'username', 'editing'],
 	created() {
 		window.setGraph = graph => this.drawingBoard = graph;
 		window.getGraph = () => this.drawingBoard;
 		this.initialize();
 	},
 	data() {
-		return {drawingBoard, holdingDown, colors, currentColor, lightColors, darkColors};
+		return {drawingBoard, holdingDown, colors, currentColor, lightColors, darkColors, prevDrawingBoard: null};
 	},
 	methods: {
 		colorDay(dayIndex) {
 			if(this.holdingDown) {
-				this.drawingBoard[dayIndex] = this.currentColor;
+				if(!this.editing || (this.editing && this.currentColor >= this.prevDrawingBoard[dayIndex]))
+					this.drawingBoard[dayIndex] = this.currentColor;
 			}
 		},
 		updateHoldingDown(val) {
@@ -94,6 +95,7 @@ export default {
 		},
 		initialize(drawingBoard = null) {
 			this.drawingBoard = drawingBoard || initializeEmptyCanvas(this.year);
+			this.prevDrawingBoard = JSON.parse(JSON.stringify(this.drawingBoard)); // make a hard copy
 		},
 		yearStartOffset
 	}

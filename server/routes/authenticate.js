@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { existsSync } = require('fs');
 const fetch = require('node-fetch');
 const { URLSearchParams } = require('url');
 const db = require('monk')('mongodb://localhost/contribeautiful');
@@ -30,11 +31,10 @@ router.get('/', async(req, res) => {
 	}
 
 	const {access_token} = await tokenRequest.json();
-	const {login, id} = GitUtils.getGitHubProifle(access_token);
+	const {login, id} = await GitUtils.getGitHubProifle(access_token);
 
 	const users = db.get('users');
 	const user = await users.findOneAndUpdate({github_id: id}, {$set: {access_token}}, {upsert: true});
-
 	// Create a repo if the user doesn't already have one.
 	const repoReq = await fetch(`https://api.github.com/repos/${login}/contribeautiful_data`);
 	if(repoReq.status == 404) { // check if the repo exists
@@ -58,6 +58,9 @@ router.get('/', async(req, res) => {
 			res.status(500).send('Failed to create repo');
 			return;
 		}
+	} else if(repoReq.ok && !existsSync(`repos/${user._id}`)) {
+		res.redirect(`${clientUrl}?error&username=${login}`);
+		return;
 	}
 
 	res.redirect(`${clientUrl}/${user._id}`);

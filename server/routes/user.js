@@ -1,14 +1,15 @@
 const router = require('express').Router();
 const db = require('monk')('mongodb://localhost/contribeautiful');
 const ObjectId = require('mongodb').ObjectID;
+const fs = require('fs');
 
-const users = db.get('users');
 
 router.get('/:id', async(req, res) => {
 	const id = req.params.id;
 	if(!ObjectId.isValid(id))
 		return res.sendStatus(400);
-
+	
+	const users = db.get('users');
 	const user = await users.findOne({_id: req.params.id});
 	
 	if(user)
@@ -19,11 +20,16 @@ router.get('/:id', async(req, res) => {
 });
 
 router.delete('/:id', async(req, res) => {
-	const id = req.params.id;
+	const { id } = req.params;
 	if(!ObjectId.isValid(id))
 		return res.sendStatus(400);
-
-	const user = await users.deleteOne({_id: id});
-	res.sendStatus(user ? 204 : 404);
+	try {
+		const users = db.get('users');
+		const user = await users.remove({_id: id});
+		fs.rm(`repos/${id}`, { recursive: true }, () => {}); // For whatever reason, this needs a callback, even though I don't want to wait for delete to finish.
+		res.sendStatus(user ? 204 : 400);
+	} catch(error) {
+		res.status(400).send(`Something went wrong Deleting this user ${error}`);
+	}
 });
 module.exports = router;

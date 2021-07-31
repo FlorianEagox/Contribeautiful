@@ -2,7 +2,7 @@
 	<div v-if="progress && total" id="progress-bar" :class="{hidden}">
 		<div id="progress" :style="`width: ${Math.floor((progress / total) * 100)}%`">
 			<h3 id="progress-status">
-				<span v-if="!progress.includes('push')">{{progress}} of {{total}} commits</span>
+				<span v-if="!progress.includes('push') || !progress.includes('clean')">{{progress}} of {{total}} commits</span>
 				<span v-else>{{progress}}</span>
 			</h3>
 		</div>

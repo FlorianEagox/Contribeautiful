@@ -1,8 +1,11 @@
 <template>
-	<div :class="['toast', status]" :style="`animation-delay: ${TTL}.0s`" v-text="text" />
+	<div :class="['toast', status]" :style="`animation-delay: ${TTL}.0s`" v-html="text" />
 </template>
 
 <script>
+import Toast from './Toast.vue';
+import { createApp } from 'vue';
+
 export default {
 	props: {
 		text: String,
@@ -16,6 +19,14 @@ export default {
 			}, this.TTL * 1000 + 2000);
 	},
 };
+
+export async function makeToast(text, el, status = 'error', TTL = 5) {
+	const errorToast = createApp(Toast, { text, status, TTL});
+	const mountPoint = document.createElement('div');
+	errorToast.mount(mountPoint);
+	el.insertAdjacentElement('afterend', mountPoint);
+	return mountPoint;
+}
 </script>
 
 <style scoped>

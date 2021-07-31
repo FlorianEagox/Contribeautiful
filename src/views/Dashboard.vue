@@ -15,7 +15,8 @@
 			</div>
 		</div>
 		<main>
-			<Canvas :year="selectedYear" :username="githubProfile?.login" id="canvas" ref="canvas" />
+			<Canvas id="canvas" ref="canvas"
+				:year="selectedYear" :username="githubProfile?.login" :editing="editing"/>
 			<section id="year">
 				<p>Year</p>
 				<hr>
@@ -36,8 +37,7 @@
 import Header from '../components/Header';
 import Canvas from '../components/Canvas';
 import ProgressBar from '../components/ProgressBar';
-import Toast from '../components/Toast';
-import {createApp} from 'vue';
+import { makeToast } from '../components/Toast';
 
 let userData = null;
 const currentYear = new Date().getFullYear();
@@ -69,13 +69,13 @@ export default {
 				localStorage.removeItem('userID');
 				// Delete the user from the db
 				await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${userID}`, {method: 'DELETE'});
-				this.makeToast('It appears the API no longer has access to your accont \n You can re-authorize after reloading', 'error', 10);
+				makeToast('It appears the API no longer has access to your accont \n You can re-authorize after reloading', this.$refs.main, 'error', 10);
 				setTimeout(() => {
 					this.$router.push('/');
 				}, 10000);
 			}
 		} catch(e) {
-			this.makeToast(`Something went wrong connection to the server or GitHub \n ${e}`);
+			makeToast(`Something went wrong connection to the server or GitHub \n ${e}`, this.$refs.main);
 		}
 	},
 	data() {
@@ -97,7 +97,7 @@ export default {
 			let commitData = this.$refs.canvas.drawingBoard;
 			let method = 'POST';
 			if(this.editing) {
-				commitData = commitData.map((newVal, index) => newVal - this.originalData[index]);
+				commitData = commitData.map((newVal, index) => (newVal > this.originalData[index]) ? newVal : 0);
 				method = 'PATCH';
 			}
 			console.log(commitData);
@@ -124,7 +124,7 @@ export default {
 						this.lastCommit = value.split(' ')[1];
 					else if(value.includes('error')) {
 						console.error(value);
-						this.makeToast(`Something went wrong!\n ${value}`);
+						makeToast(`Something went wrong!\n ${value}`, this.$refs.main);
 						return;
 					}
 					else
@@ -132,13 +132,13 @@ export default {
 				}
 				if(response.ok) {
 					this.selectYear(); // This triggers the client to update and shows the user that their commits have been made.
-					this.makeToast(`made ${this.progressTotal} commits & pushed to GitHub!`, 'success');
+					makeToast(`made ${this.progressTotal} commits & pushed to GitHub!`, this.$refs.main, 'success');
 				}
 				else
-					this.makeToast(`Something went wrong! \n ${await response.text()}`);
+					makeToast(`Something went wrong! \n ${await response.text()}`, this.$refs.main);
 			} catch(e) {
 				console.error(e);
-				this.makeToast(`Something went wrong! \n ${e}`);
+				makeToast(`Something went wrong! \n ${e}`, this.$refs.main);
 			}
 			this.progressHidden = true; // hide the progress bar when the requst is done
 		},
@@ -155,16 +155,9 @@ export default {
 				}
 			} catch(e) {
 				console.error(e);
-				this.makeToast(`Something went terribly wrong! \n ${e}`);
+				makeToast(`Something went terribly wrong! \n ${e}`, this.$refs.main);
 			}
-		},
-		async makeToast(text, status = 'error', TTL = 5) {
-			const errorToast = createApp(Toast, { text, status, TTL});
-			const mountPoint = document.createElement('div');
-			errorToast.mount(mountPoint);
-			this.$refs.main.insertAdjacentElement('afterend', mountPoint);
-			return mountPoint;
-		},
+		}
 	}
 };
 </script>
