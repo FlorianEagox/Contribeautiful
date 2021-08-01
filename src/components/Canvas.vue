@@ -77,7 +77,7 @@ export default {
 			else if(this.currentColor < 0) this.currentColor = colors.length - 1;
 		},
 		clear() {
-			this.drawingBoard.fill(0);
+			this.drawingBoard = [...this.prevDrawingBoard];
 		},
 		importImage(e) {
 			const file = e.target.files[0];
@@ -88,7 +88,7 @@ export default {
 				img.src = e.target.result;
 				document.body.append(img);
 				createImageBitmap(img).then(imageData => {
-					console.log('hi!');
+
 				});
 			});
 			reader.readAsDataURL(file);

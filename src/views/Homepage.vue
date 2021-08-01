@@ -26,10 +26,10 @@
 				<h2>About</h2>
 				<hr>
 				<p>
-					Contribeautiful is a webapp built to let you generate totally customizable GitHub contribution history graphs. You sign up with your github account, and then you're taken to the dashboard, where you can start drawing. There are five colors, each representing the ammount of commits needed to display that color on GitHub's site. You can also choose to use the colors for either GitHub's light or dark theme.
+					Contribeautiful is a webapp built to let you generate totally customizable GitHub contribution history graphs. You sign up with your GitHub account, and then you're taken to the dashboard, where you can start drawing. There are five colors, each corresponding to the number of commits needed to display that color on GitHub's site. You can also choose to use the colors for either GitHub's light or dark theme.
 				</p>
 				<p>
-					GitHub's graph will display all contributions with your signature, even ones that have been signed in the past, so Contribeautiful can edit your history retroactively!
+					GitHub's graph will display all contributions with your signature, even ones that have been signed in the past, so Contribeautiful can edit your history retroactively! You can also edit your graphs at any time, but, you cannot remove commits without remaking the whole repository.
 				</p>
 				<h3>How it works</h3>
 				<p>
@@ -42,12 +42,14 @@
 					</ol>
 				</p>
 				<p>
-					Signing up will give the server access to a GitHub access token that has limited capiblities including creating the contribeautiful_data repository and viewing your GitHub email address (for signing commits as you).
+					Signing up will give the server access to a GitHub access token with limited capabilities including editing repositories (creating the contribeautiful_data repo and pushing to it) and viewing your GitHub email address (for signing commits as you).
 				</p>
 				<p>
-					You can have this deleted and revoke access any time, and if you want your history back to the way it was, you just have to delete your repo from GitHub.
+					You can have this deleted and revoke access at any time, and if you want your history back to the way it was, you simply have to delete your repo from GitHub.
 				</p>
-				<p>If you don't trust this version of the service, you're always free to download the source code and run the tool yourself.</p>
+				<p>
+					If you don't trust this version of the service, you're always free to download the source code and run the tool yourself.
+				</p>
 			</div>
 		</section>
 	</div>
@@ -89,10 +91,17 @@ export default {
 </script>
 
 <style scoped>
+	#container {
+		scroll-snap-type: y mandatory;
+		height: 100vh;
+		overflow: auto;
+	}
 	.grid-container {
 		height: 100vh;
 		display: grid;
 		place-items: center;
+		scroll-snap-align: start end;
+		overflow: auto;
 	}
 	a {
 		color: inherit;
@@ -138,4 +147,23 @@ export default {
 	#about h3, #about p {
 		margin: 0.5em 0;
 	}
+@media (max-width: 600px) {
+	.wrapper {
+		margin: auto;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-evenly;
+		height: 100%;
+		width: 95%;
+	}
+	#title {
+		font-size: 2.5em;
+	}
+	#logo {
+		margin: 0 auto;
+	}
+	.wrapper button, .wrapper .btn {
+		font-size: 1em;
+	}
+}
 </style>

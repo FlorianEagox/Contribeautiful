@@ -31,6 +31,7 @@
 		border-radius: 30px;
 		margin: 0.3em;
 		border: 2px solid white;
+		max-width: 300px;
 	}
 	button:hover, .btn:hover {
 		color: rgba(0, 0, 0, .8);

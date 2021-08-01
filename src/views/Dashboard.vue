@@ -1,7 +1,7 @@
 <template>
 	<Header :username="githubProfile?.login" />		
 	<div class="container" ref="main">
-		<h1 id="lbl-dashboard">Dashboard</h1>
+		<h1 class="label">Dashboard</h1>
 		<div id="user">
 			<img id="profile-picture" :src="githubProfile?.avatar_url" alt="profile pic" >
 			<div class="text">
@@ -169,11 +169,14 @@ export default {
 		justify-content: space-evenly;
 		align-content: start;
 		grid-auto-flow: row;
+		padding-bottom: 1em;
+		max-width: 2500px;
+		margin: auto;
 	}
 	.container > * {
 		grid-column: 1/3;
 	}
-	#lbl-dashboard {
+	.label {
 		text-align: center;
 		padding: 0 0.4em;
 		padding-bottom: 0.4em;
@@ -184,7 +187,7 @@ export default {
 	#user {
 		border-radius: 25px;
 		box-shadow: 0 0 5px rgba(0, 0, 0, 1);
-		overflow: hidden;
+		overflow: auto;
 		word-wrap: break-word;
 		max-width: 300px;
 		grid-column: 1 / 2;
@@ -230,5 +233,25 @@ export default {
 	}
 	#year label:hover {
 		background: #666;
+	}
+	@media (max-width: 1200px) {
+		.container {
+			display: flex;
+			flex-direction: column;
+			place-items: center;
+		}
+		main {
+			overflow: scroll;
+			max-width: 100%;
+		}
+		main, main > * {
+			grid-column: 1 !important;
+		}
+		#lbl-dashboard {
+			margin-bottom: 2em;
+		}
+		#year ul {
+			display: flex;
+		}
 	}
 </style>

@@ -8,20 +8,20 @@ A vue & express webapp to generate custom GitHub contribution history!
 
 ## Definitely
 - ~~REDO THAT GOD AWFUL DESIGN~~
-- ~~User prompts of completed, error etc
+- ~~User prompts of completed, error etc~~
 - ~~Storing the last commit in the DB so we don't clone a repo with things the app didn't create~~
-- ~~Revoke authorization and delete data
+- ~~Revoke authorization and delete data~~
 - Tooltip of the date you're drawing on
 - ~~Calendar stops at Dec 31st~~
 - Switch to ES6 modules for the backend instead of CommonJS
 ## Possible
-- Edit none-destructively: check for commits already made that day and not commit if we don't need to
+- ~~Edit none-destructively: check for commits already made that day and not commit if we don't need to~~
 - Automatically Delete the repo from the Github (NO FOR NOW FOR SECURITY REASONS)
 - Import an image as a 52x7 github contribution history image
 - graph of current year starts with the current date of last year and goes to current date
-- Delete individual years of history (No for now)
+- Delete individual years of history (impossible for now)
 - Better click detection / drawing tools
-- Mobile friendly UI? (Meh, probably not cause who would use this on mobile???)
+- ~~Mobile friendly UI? (Meh, probably not cause who would use this on mobile???)~~
 ## Project setup
 ```
 npm i

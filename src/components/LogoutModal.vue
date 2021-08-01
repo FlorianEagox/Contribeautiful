@@ -3,7 +3,7 @@
 		<div id="box">
 			<h1>Logout</h1>
 			<p>
-				You can log off of the website, however your data and local repo will still remain on the server in case you ever want to make modifications to them.
+				You can log off of the website, however, your data and local repo will still remain on the server in case you ever want to make modifications to them.
 			</p>
 			<p>
 				You can also delete your data (GH access token) as well as your local repo. Your contribution history will still remain on GitHub so long as you don't delete your contribeautiful_data repository, however, if you want to modify your history again, you'll have to delete that repo from GitHub before re-authorizing.
@@ -41,6 +41,12 @@ export default {
 </script>
 
 <style scoped>
+	h1 {
+		display:inline-block;
+		padding: 0 0.2em 0.2em;
+		margin-bottom: 0.2em;
+		border-bottom: 3px solid white;
+	}
 	#modal {
 		position: fixed;
 		top: 0;
@@ -56,8 +62,17 @@ export default {
 		box-shadow: 0 0 8px 8px rgba(0,0,0,0.19);
 		background: #444;
 		max-width: 700px;
+		overflow-y: scroll;
+		z-index: 1;
+		max-height: 80vh;
 	}
 	p {
 		margin: 0.5em 0;
+	}
+	@media (max-width: 800px) {
+		#box {
+			max-width: 350px;
+			padding: 1em;
+		}
 	}
 </style>

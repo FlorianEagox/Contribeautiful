@@ -45,10 +45,24 @@ export default {
 	}
 	header #logo {
 		width: 60px;
-		margin: 0.5em;
 	}
 	#logout {
 		margin-left: auto;
 		margin-top: inherit;
+	}
+	@media (max-width: 600px) {
+		#container {
+			width: 100%;
+		}
+		header #logo {
+			width: 40px;
+		}
+		header h1 {
+			font-size: 1.6em;
+		}
+		#logout {
+			font-size: 1em;
+			margin: 0 auto;
+		}
 	}
 </style>
