@@ -8,6 +8,9 @@
 		"lint": "vue-cli-service lint",
 		"server": "nodemon server/server.js --trace-deprecation"
 	},
+	"vue": {
+		"publicPath": "/contribeautiful"
+	},
 	"dependencies": {
 		"core-js": "^3.7.0",
 		"cors": "^2.8.5",

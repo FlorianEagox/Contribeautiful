@@ -11,6 +11,6 @@ app.use('/authenticate', require('./routes/authenticate'));
 app.use('/user', require('./routes/user'));
 app.use('/graph', require('./routes/graph'));
 
-const listener = app.listen(3500, () => {
+const listener = app.listen(process.env.PORT, () => {
 	console.log(`Listening on ${listener.address().port}`);
 });

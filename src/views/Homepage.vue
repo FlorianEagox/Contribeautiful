@@ -63,8 +63,8 @@ export default {
 	name: 'Homepage',
 	components: {Title},
 	async created() {
-		if(this.$route.params.id) {
-			const reqUser = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${this.$route.params.id}`);
+		if(this.$route.query.id) {
+			const reqUser = await fetch(`${process.env.VUE_APP_SERVER_BASE_URL}/user/${this.$route.query.id}`);
 			if(reqUser.ok) {
 				const userData = await reqUser.json();
 				localStorage.setItem('userID', userData._id);
@@ -75,11 +75,12 @@ export default {
 		}
 	},
 	mounted() {
-		if(this.$route.query.username) {
+		if(this.$route.query.username)
 			makeToast(`It seems you have previously deleted your data, but not your repo.
 			Please delete your github repo <a href="https://github.com/${this.$route.query.username}/contribeautiful_data/settings#danger-zone" target="_blank">here</a> to continue using this service
-`, this.$refs.main, 'error', 5000);
-		}
+`, this.$refs.main, 'error', -1);
+		else if(this.$route.query.error)
+			makeToast(this.$route.query.error, this.$refs.main, 'error', -1);
 	},
 	data() {
 		return {

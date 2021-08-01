@@ -1,5 +1,7 @@
 <template>
-	<div :class="['toast', status]" :style="`animation-delay: ${TTL}.0s`" v-html="text" />
+	<div :class="['toast', status]"
+		:style="`animation-delay: ${TTL}.0s; ${TTL < 0 ? 'animation: none;' : ''}`"
+		v-html="text" />
 </template>
 
 <script>
@@ -17,7 +19,7 @@ export default {
 			setTimeout(() => {
 				this.$el.parentNode.parentNode.removeChild(this.$el.parentNode);
 			}, this.TTL * 1000 + 2000);
-	},
+	}
 };
 
 export async function makeToast(text, el, status = 'error', TTL = 5) {
