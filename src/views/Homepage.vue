@@ -37,7 +37,7 @@
 					<ol>
 						<li>A repository will be created on your GitHub account</li>
 						<li>The repo will be cloned to the server</li>
-						<li>Commits will be made in the ammount you specify on the days you drew for that year</li>
+						<li>Commits will be made in the amount you specify on the days you drew for that year</li>
 						<li>The local repo will be pushed to the server.</li>
 					</ol>
 				</p>
