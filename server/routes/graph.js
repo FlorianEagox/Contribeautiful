@@ -62,6 +62,7 @@ async function updateGraph(req, res, editing = false) {
 		await userCol.findOneAndUpdate({_id: user}, {$set: {lastCommit: lastID}});
 		res.write('lastid ' + lastID);
 	} catch(e) {
+		console.log(e)
 		res.status(500).write(`error ${JSON.stringify(e)}`);
 	}
 	clearInterval(updateProgressInterval); // We're done, stop sending progress updates

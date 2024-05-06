@@ -1,88 +1,87 @@
 {
-	"name": "contribeautiful",
-	"private": true,
-	"scripts": {
-		"client": "vue-cli-service serve --host sethpainter.com --port 3000",
-		"utils": "node server/UtilTester.js",
-		"build": "vue-cli-service build",
-		"lint": "vue-cli-service lint",
-		"server": "nodemon server/server.js --trace-deprecation"
-	},
-	"vue": {
-		"publicPath": "/contribeautiful"
-	},
-	"dependencies": {
-		"core-js": "^3.7.0",
-		"cors": "^2.8.5",
-		"dotenv": "^8.2.0",
-		"express": "^4.17.1",
-		"github-calendar": "^2.2.6",
-		"monk": "^7.3.2",
-		"node-fetch": "^2.6.1",
-		"nodegit": "^0.27.0",
-		"vue": "^3.0.2",
-		"vue-router": "^4.0.0-rc.3"
-	},
-	"devDependencies": {
-		"@vue/cli-plugin-babel": "^4.5.9",
-		"@vue/cli-plugin-eslint": "^4.5.9",
-		"@vue/cli-plugin-router": "^4.5.9",
-		"@vue/cli-service": "^4.5.9",
-		"@vue/compiler-sfc": "^3.0.2",
-		"babel-eslint": "^10.1.0",
-		"eslint": "^6.7.2",
-		"eslint-plugin-vue": "^7.1.0",
-		"lint-staged": "^9.5.0",
-		"morgan": "^1.10.0",
-		"nodemon": "^2.0.6"
-	},
-	"eslintConfig": {
-		"root": true,
-		"env": {
-			"node": true
-		},
-		"extends": [
-			"plugin:vue/vue3-essential",
-			"eslint:recommended"
-		],
-		"parserOptions": {
-			"parser": "babel-eslint"
-		},
-		"rules": {
-			"vue/html-indent": [
-				1,
-				"tab"
-			],
-			"indent": [
-				1,
-				"tab"
-			],
-			"allowIndentationTabs": 0,
-			"no-tabs": 0,
-			"semi": [
-				1,
-				"always"
-			],
-			"quotes": [
-				1,
-				"single"
-			],
-			"space-before-function-paren": [
-				1,
-				"never"
-			],
-			"curly": 0,
-			"eqeqeq": 0,
-			"arrow-parens": 0,
-			"no-unused-vars": "warn",
-			"no-constant-condition": 0,
-			"vue/no-unused-components": 0
-
-		}
-	},
-	"browserslist": [
-		"> 1%",
-		"last 2 versions",
-		"not dead"
-	]
+  "name": "contribeautiful",
+  "private": true,
+  "scripts": {
+    "client": "vue-cli-service serve --host sethpainter.com --port 3000",
+    "utils": "node server/UtilTester.js",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "server": "nodemon server/server.js --trace-deprecation"
+  },
+  "vue": {
+    "publicPath": "/contribeautiful"
+  },
+  "dependencies": {
+    "core-js": "^3.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "github-calendar": "^2.2.6",
+    "monk": "^7.3.4",
+    "node-fetch": "^2.6.1",
+    "nodegit": "^0.27.0",
+    "vue": "^3.0.2",
+    "vue-router": "^4.0.0-rc.3"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^4.5.9",
+    "@vue/cli-plugin-eslint": "^4.5.9",
+    "@vue/cli-plugin-router": "^4.5.9",
+    "@vue/cli-service": "^4.5.9",
+    "@vue/compiler-sfc": "^3.0.2",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^7.1.0",
+    "lint-staged": "^9.5.0",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.6"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {
+      "vue/html-indent": [
+        1,
+        "tab"
+      ],
+      "indent": [
+        1,
+        "tab"
+      ],
+      "allowIndentationTabs": 0,
+      "no-tabs": 0,
+      "semi": [
+        1,
+        "always"
+      ],
+      "quotes": [
+        1,
+        "single"
+      ],
+      "space-before-function-paren": [
+        1,
+        "never"
+      ],
+      "curly": 0,
+      "eqeqeq": 0,
+      "arrow-parens": 0,
+      "no-unused-vars": "warn",
+      "no-constant-condition": 0,
+      "vue/no-unused-components": 0
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }

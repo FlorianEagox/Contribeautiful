@@ -13,7 +13,6 @@ router.get('/', async(req, res) => {
 		res.status(400).send('No code :(');
 		return;
 	}
-
 	const params = new URLSearchParams();
 	params.append('client_id', process.env.VUE_APP_GH_CLIENT_ID);
 	params.append('client_secret', process.env.GH_CLIENT_SECRET);
@@ -27,7 +26,7 @@ router.get('/', async(req, res) => {
 		});
 
 		if (!tokenRequest.ok) {
-			res.status(500).send('Oopsie Poopsie, something went wrong!');
+			res.status(500).send('Oopsie Poopsie, something went wrong! x_X' + tokenRequest.url + await tokenRequest.text());
 			return;
 		}
 
